@@ -2,7 +2,6 @@
 require_once '../infra/auth.php';
 
 exigir_admin();
-$adminCadastrando = true;
 
 // Variáveis do formulário (começam vazias).
 $erro = '';
@@ -111,242 +110,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../Assets/css/cadastro.css">
+    <link rel="stylesheet" href="../Assets/css/sidebar.css">
+    <link rel="stylesheet" href="../Assets/css/gestao.css">
 </head>
 
-<body>
-
-    <main>
-
-        <div>
-
-            <video
-                class="video_inicial"
-                src="../Assets/videos/video.login.mp4"
-                autoplay
-                loop
-                muted
-                playsinline>
-            </video>
-
-            <div class="container_login_2">
-
-                <img
-                    src="../Assets/logos/logo_sem_fundo.png"
-                    alt="Logo"
-                    class="logo_login">
-
-                <div id="form">
-
-                    <form id="formCadastro" method="POST">
-
-                        <?php if ($erro !== ''): ?>
-                            <!-- Mostra o erro aqui dentro do card, no lugar do alert() -->
-                            <div style="margin: 0 20px;"><?= mensagem('danger', $erro) ?></div>
-                        <?php endif; ?>
-
-                        <label class="label_login" for="nomeCadastro">
-                            Nome completo
-                        </label>
-
-                        <input
-                            class="form_text"
-                            type="text"
-                            id="nomeCadastro"
-                            name="nome"
-                            placeholder="Digite seu nome completo"
-                            value="<?= htmlspecialchars($nome) ?>"
-                            required>
-
-                        <label class="label_login" for="emailCadastro">
-                            Email
-                        </label>
-
-                        <input
-                            class="form_text"
-                            type="email"
-                            id="emailCadastro"
-                            placeholder="Digite seu email"
-                            required
-                            name="email"
-                            value="<?= htmlspecialchars($email) ?>">
-
-                        <br>
-
-                        <label class="label_login" for="senhaCadastro">
-                            Senha
-                        </label>
-
-                        <input
-                            class="form_text"
-                            type="password"
-                            id="senhaCadastro"
-                            minlength="8"
-                            placeholder="Digite sua senha"
-                            required
-                            name="senha">
-
-                        <br>
-
-                        <label class="label_login" for="confirmaSenha">
-                            Confirmar Senha
-                        </label>
-
-                        <input
-                            class="form_text"
-                            type="password"
-                            id="confirmaSenha"
-                            minlength="8"
-                            placeholder="Confirme sua senha"
-                            required
-                            name="confirmaSenha">
-
-                        <br>
-                        
-<label class="label_login" for="cep">CEP</label>
-<input
-    class="form_text"
-    type="text"
-    id="cep"
-    name="cep"
-    placeholder="00000-000"
-    maxlength="9"
-    autocomplete="postal-code"
->
-
-<label class="label_login" for="logradouro">Logradouro</label>
-<input
-    class="form_text"
-    type="text"
-    id="logradouro"
-    name="logradouro"
-    placeholder="Rua ou avenida"
-    autocomplete="address-line1"
->
-
-<label class="label_login" for="bairro">Bairro</label>
-<input
-    class="form_text"
-    type="text"
-    id="bairro"
-    name="bairro"
->
-
-<label class="label_login" for="cidade">Cidade</label>
-<input
-    class="form_text"
-    type="text"
-    id="cidade"
-    name="cidade"
-    autocomplete="address-level2"
->
-
-<label class="label_login" for="uf">Estado (UF)</label>
-<input
-    class="form_text"
-    type="text"
-    id="uf"
-    name="uf"
-    placeholder="SC"
-    maxlength="2"
-    autocomplete="address-level1"
->
-
-<p id="mensagem-cep" role="status"></p>
-
-                        <?php if ($adminCadastrando): ?>
-
-                        <label class="label_login" for="perfilCadastro">
-                            Perfil
-                        </label>
-
-                        <select class="form_text" id="perfilCadastro" name="id_perfil" required>
-                            <option value="<?= PERFIL_USUARIO ?>">Usuário</option>
-                            <option value="<?= PERFIL_FUNCIONARIO ?>">Funcionário</option>
-                            <option value="<?= PERFIL_ADMIN ?>">Administrador</option>
-                        </select>
-
-                        <br>
-
-                        <div class="login_1">
-                            <a href="usuario_lista.php" style="text-decoration: none; color: inherit; display: block; text-align: center;">
-                                ← Voltar para a lista de usuários
-                            </a>
+<body class="cadastro-usuarios">
+    <div class="tela">
+        <?php require '../infra/sidebar.php'; ?>
+        <main class="conteudo">
+            <header class="cadastro-topo">
+                <h1>Cadastrar usuário</h1>
+                <?php require '../infra/usuario_topo.php'; ?>
+            </header>
+            <section class="cadastro-painel" aria-label="Dados do novo usuário">
+                <form id="formCadastro" method="POST">
+                    <?php if ($erro !== ''): ?>
+                        <div class="cadastro-alerta" role="alert"><?= mensagem('danger', $erro) ?></div>
+                    <?php endif; ?>
+                    <fieldset>
+                        <legend>Dados de acesso</legend>
+                        <div class="cadastro-campos">
+                            <div class="cadastro-campo">
+                                <label for="nomeCadastro">Nome completo</label>
+                                <input type="text" id="nomeCadastro" name="nome" value="<?= htmlspecialchars($nome) ?>" maxlength="100" autocomplete="name" required>
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="emailCadastro">E-mail</label>
+                                <input type="email" id="emailCadastro" name="email" value="<?= htmlspecialchars($email) ?>" maxlength="100" autocomplete="email" required>
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="senhaCadastro">Senha</label>
+                                <input type="password" id="senhaCadastro" name="senha" minlength="8" autocomplete="new-password" aria-describedby="ajuda-senha" required>
+                                <span id="ajuda-senha" class="cadastro-ajuda">Mínimo de 8 caracteres.</span>
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="confirmaSenha">Confirmar senha</label>
+                                <input type="password" id="confirmaSenha" name="confirmaSenha" minlength="8" autocomplete="new-password" required>
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="perfilCadastro">Perfil de acesso</label>
+                                <select id="perfilCadastro" name="id_perfil" required>
+                                    <option value="<?= PERFIL_USUARIO ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_USUARIO ? 'selected' : '' ?>>Usuário</option>
+                                    <option value="<?= PERFIL_FUNCIONARIO ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_FUNCIONARIO ? 'selected' : '' ?>>Funcionário</option>
+                                    <option value="<?= PERFIL_ADMIN ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_ADMIN ? 'selected' : '' ?>>Administrador</option>
+                                </select>
+                            </div>
                         </div>
-
-                        <?php else: ?>
-
-                        <div class="login_1">
-
-                            <input
-                                class="checkbox_login"
-                                type="checkbox"
-                                name="termos"
-                                id="termos"
-                                required>
-
-                            <label for="termos">
-                                Aceito os
-                            </label>
-
-                            <a
-                                href="../public/termo_de_uso.html"
-                                target="_blank"
-                                id="linkTermos">
-                                Termos de Uso
-                            </a>
-
+                    </fieldset>
+                    <fieldset>
+                        <legend>Endereço <span class="cadastro-opcional">Opcional</span></legend>
+                        <div class="cadastro-campos">
+                            <div class="cadastro-campo">
+                                <label for="cep">CEP</label>
+                                <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" autocomplete="postal-code" aria-describedby="mensagem-cep" value="<?= htmlspecialchars($cep ?? '') ?>">
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="logradouro">Logradouro</label>
+                                <input type="text" id="logradouro" name="logradouro" autocomplete="address-line1" value="<?= htmlspecialchars($logradouro ?? '') ?>">
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="bairro">Bairro</label>
+                                <input type="text" id="bairro" name="bairro" value="<?= htmlspecialchars($bairro ?? '') ?>">
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="cidade">Cidade</label>
+                                <input type="text" id="cidade" name="cidade" autocomplete="address-level2" value="<?= htmlspecialchars($cidade ?? '') ?>">
+                            </div>
+                            <div class="cadastro-campo">
+                                <label for="uf">Estado (UF)</label>
+                                <input type="text" id="uf" name="uf" placeholder="SC" maxlength="2" autocomplete="address-level1" value="<?= htmlspecialchars($uf ?? '') ?>">
+                            </div>
                         </div>
-
-                        <div class="login_1">
-
-                            <a
-                                href="../public/login.php"
-                                id="text_log"
-                                style="
-                                    text-decoration: none;
-                                    color: inherit;
-                                    display: block;
-                                    cursor: pointer;
-                                    text-align: center;
-                                ">
-                                Já possui conta? Voltar para o Login.
-                            </a>
-
-                        </div>
-
-                        <?php endif; ?>
-
-                        <br>
-
-                        <button id="button_login" type="submit">
-                            Cadastrar
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous">
-    </script>
+                        <p id="mensagem-cep" class="cadastro-ajuda" role="status" aria-live="polite"></p>
+                    </fieldset>
+                    <div class="cadastro-acoes">
+                        <a href="usuario_lista.php" class="cadastro-botao cadastro-voltar">Voltar para usuários</a>
+                        <button id="button_login" class="cadastro-botao cadastro-salvar" type="submit">Cadastrar usuário</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
     <script src="../scripts/cep.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
-        integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
-        crossorigin="anonymous">
-    </script>
-
-    
-
 </body>
-
 </html>

@@ -1,0 +1,31 @@
+/* Layout exclusivo do cadastro administrativo de usuários. */
+.cadastro-usuarios { margin: 0; min-width: 320px; min-height: 100vh; font-family: "Poppins", sans-serif; color: #242c3b; background: #e6e9ed; }
+.cadastro-usuarios *, .cadastro-usuarios *::before, .cadastro-usuarios *::after { box-sizing: border-box; }
+.cadastro-usuarios .conteudo { min-width: 0; min-height: 100vh; padding: 32px clamp(20px, 4vw, 56px) 48px; }
+.cadastro-topo { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1100px; margin: 0 auto 28px; }
+.cadastro-topo h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.15rem); font-weight: 600; line-height: 1.25; letter-spacing: -.025em; }
+.cadastro-painel { max-width: 1100px; margin: 0 auto; padding: clamp(20px, 3vw, 32px); border: 1px solid #dce1e7; border-radius: 10px; background: #fff; box-shadow: 0 3px 12px rgba(32,38,52,.05); }
+.cadastro-usuarios fieldset { min-width: 0; margin: 0 0 28px; padding: 0 0 28px; border: 0; border-bottom: 1px solid #e3e7ed; }
+.cadastro-usuarios legend { float: none; width: auto; margin: 0 0 24px; padding: 0; font-size: 1.05rem; font-weight: 600; }
+.cadastro-opcional { margin-left: 8px; font-size: .75rem; font-weight: 400; color: #596475; }
+.cadastro-campos { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: start; gap: 20px 28px; }
+.cadastro-campo { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.cadastro-campo label { font-size: .85rem; font-weight: 500; }
+.cadastro-campo input, .cadastro-campo select { width: 100%; min-width: 0; height: 44px; padding: 10px 12px; border: 1px solid #b9c2ce; border-radius: 6px; color: #242c3b; background: #fff; font: 400 .9rem/1.5 "Poppins", sans-serif; }
+.cadastro-campo input::placeholder { color: #667183; }
+.cadastro-ajuda { margin: 0; color: #596475; font-size: .75rem; line-height: 1.6; }
+#mensagem-cep:not(:empty) { margin-top: 16px; }
+.cadastro-acoes { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.cadastro-botao { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border: 1px solid transparent; border-radius: 6px; font: 500 .875rem/1.5 "Poppins", sans-serif; text-decoration: none; cursor: pointer; }
+.cadastro-voltar { background: #fff; color: #31384a; border-color: #b9c2ce; }
+.cadastro-voltar:hover { background: #f3f5f7; color: #242c3b; }
+.cadastro-salvar { background: #df9b49; color: #242c3b; }
+.cadastro-salvar:hover { background: #d28d3c; }
+.cadastro-usuarios :is(a,button,input,select):focus-visible { outline: 3px solid #935510; outline-offset: 3px; }
+@media (max-width: 700px) {
+    .cadastro-usuarios .conteudo { padding: 24px 16px 110px; }
+    .cadastro-topo { gap: 12px; margin-bottom: 24px; }
+    .cadastro-campos { grid-template-columns: 1fr; gap: 18px; }
+    .cadastro-acoes { flex-direction: column-reverse; }
+    .cadastro-botao { width: 100%; }
+}
