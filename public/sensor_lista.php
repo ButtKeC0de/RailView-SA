@@ -32,7 +32,6 @@ if ($id) {
     $resultado = $stmt->get_result();
     $stmt->close();
 } else {
-    // Busca todos os sensores.
     $resultado = $conexao->query($select . " ORDER BY s.id_sensor DESC");
 }
 
@@ -83,7 +82,6 @@ if ($resultado) {
                 <?php if (!empty($mensagem)) echo $mensagem; ?>
 
                 <?php if ($id): ?>
-                    <!-- Está mostrando só um sensor: oferece voltar para a lista completa -->
                     <p class="mb-3"><a href="sensor_lista.php" class="btn btn-dark btn-sm rounded-pill px-3">&larr; Ver todos os sensores</a></p>
                 <?php endif; ?>
 
@@ -117,7 +115,6 @@ if ($resultado) {
                                                     Editar
                                                 </a>
 
-                                                <!-- Excluir usa formulário POST: só apaga ao clicar no botão -->
                                                 <form action="sensor_excluir.php" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Tem certeza que deseja excluir este sensor?');">
                                                     <input type="hidden" name="id" value="<?= (int)$sensor['id_sensor'] ?>">
