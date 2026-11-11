@@ -230,6 +230,16 @@ body:has(.sidebar) {
     margin-bottom: 16px;
 }
 
+.estado-vazio--simples h3 {
+    margin-bottom: 20px;
+}
+
+.estado-vazio--simples > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Variação para fundo escuro */
 .estado-vazio--escuro,
 .estado-vazio--escuro h3 {

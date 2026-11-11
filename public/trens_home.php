@@ -5,6 +5,7 @@ exigir_login();
 
 $sql = "SELECT * FROM Trem ORDER BY id_trem DESC";
 $resultado = $conexao->query($sql);
+$temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
 ?>
 
@@ -69,11 +70,8 @@ $resultado = $conexao->query($sql);
 
             <?php else: ?>
 
-                <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
-                <div class="estado-vazio estado-vazio--escuro" style="grid-column: 1 / -1;">
-                    <div class="estado-vazio-icone"><i class="bi bi-train-front"></i></div>
+                <div class="estado-vazio estado-vazio--escuro estado-vazio--simples" style="grid-column: 1 / -1;">
                     <h3>Nenhum trem cadastrado</h3>
-                    <p>Os trens cadastrados vão aparecer aqui.</p>
                     <?php if (eh_admin()): ?>
                         <a href="trens_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro trem</a>
                     <?php endif; ?>
@@ -122,6 +120,7 @@ $resultado = $conexao->query($sql);
 
             <?php endif; ?>
 
+            <?php if ($temRotas): ?>
             <div class="card_mapa">
 
                 <iframe
@@ -130,6 +129,7 @@ $resultado = $conexao->query($sql);
                 ></iframe>
 
             </div>
+            <?php endif; ?>
 
         </div>
 

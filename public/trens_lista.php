@@ -207,11 +207,8 @@ if (isset($stmt)) {
                                     colspan="<?= eh_admin() ? 7 : 6 ?>"
                                     class="p-0"
                                 >
-                                    <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
-                                    <div class="estado-vazio">
-                                        <div class="estado-vazio-icone"><i class="bi bi-train-front"></i></div>
+                                    <div class="estado-vazio estado-vazio--simples">
                                         <h3><?= $id ? 'Trem não encontrado' : 'Nenhum trem cadastrado' ?></h3>
-                                        <p>Os trens cadastrados vão aparecer aqui.</p>
                                         <?php if (eh_admin()): ?>
                                             <a href="trens_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro trem</a>
                                         <?php endif; ?>
