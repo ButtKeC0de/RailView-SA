@@ -70,7 +70,6 @@
     margin-bottom: 15px;
 }
 
-/* Recorta apenas o fundo externo do ícone fornecido. */
 .sidebar-nav img.icone-usuarios {
     clip-path: circle(41% at 50% 50%);
 }
@@ -127,7 +126,6 @@
     }
 }
 
-/* Selo do usuário logado (infra/usuario_topo.php) */
 .usuario-topo {
     display: inline-flex;
     align-items: center;
@@ -196,7 +194,6 @@
     padding-top: 90px !important;
 }
 
-/* Fundo padrão de todas as páginas do sistema (vetorial, nítido em qualquer tela) */
 body:has(.sidebar) {
     background: #e6e9ed url(../Images/fundo_sistema.svg) center / cover no-repeat fixed !important;
 }
@@ -206,7 +203,6 @@ body:has(.sidebar) {
     background: transparent !important;
 }
 
-/* Estado vazio (quando ainda não há nada cadastrado) — usado em várias páginas */
 .estado-vazio {
     padding: 40px 20px;
     text-align: center;
@@ -245,7 +241,6 @@ body:has(.sidebar) {
     justify-content: center;
 }
 
-/* Variação para fundo escuro */
 .estado-vazio--escuro,
 .estado-vazio--escuro h3 {
     color: #ffffff;
