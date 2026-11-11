@@ -158,11 +158,8 @@ if ($resultado) {
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
-                        <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
-                        <div class="estado-vazio bg-white rounded-4">
-                            <div class="estado-vazio-icone"><i class="bi bi-broadcast"></i></div>
+                        <div class="estado-vazio estado-vazio--simples bg-white rounded-4">
                             <h3><?= $id ? 'Sensor não encontrado' : 'Nenhum sensor cadastrado' ?></h3>
-                            <p>Os sensores cadastrados vão aparecer aqui.</p>
                             <?php if (eh_admin()): ?>
                                 <a href="sensor_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro sensor</a>
                             <?php endif; ?>

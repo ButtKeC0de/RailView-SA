@@ -83,11 +83,8 @@ $resultado = $conexao->query($sql);
 
             <?php else: ?>
 
-                <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
-                <div class="estado-vazio estado-vazio--escuro" style="grid-column: 1 / -1;">
-                    <div class="estado-vazio-icone"><i class="bi bi-broadcast"></i></div>
+                <div class="estado-vazio estado-vazio--escuro estado-vazio--simples" style="grid-column: 1 / -1;">
                     <h3>Nenhum sensor cadastrado</h3>
-                    <p>Os sensores cadastrados vão aparecer aqui.</p>
                     <?php if (eh_admin()): ?>
                         <a href="sensor_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro sensor</a>
                     <?php endif; ?>
