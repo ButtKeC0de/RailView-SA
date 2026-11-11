@@ -14,8 +14,6 @@ $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Monta o endereço em uma linha só, ignorando as partes vazias.
-// array_filter tira os itens vazios; implode junta com ", ".
 $partesEndereco = array_filter([
     $usuario['logradouro'],
     $usuario['bairro'],
