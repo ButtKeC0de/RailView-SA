@@ -1,21 +1,3 @@
--- ============================================================
--- Banco do Rail View (MariaDB do XAMPP)
---
--- Como usar: phpMyAdmin > Importar > escolher este arquivo > Executar
--- Login padrão: usuário caio123 / senha caio123 (administrador)
---
--- Este script NÃO apaga nada e pode ser executado quantas vezes quiser:
---   * Banco novo  -> a PARTE 1 cria tudo.
---   * Banco antigo -> a PARTE 2 completa o que estiver faltando,
---                     mantendo todos os dados já cadastrados.
--- ============================================================
-
-
--- ============================================================
--- PARTE 1: criação do banco e das tabelas
--- ============================================================
-
--- utf8mb4: guarda acentos (ç, ã, é) e emojis corretamente.
 CREATE DATABASE IF NOT EXISTS rail_view_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -42,7 +24,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
     senha VARCHAR(255) NOT NULL,
     id_perfil INT NOT NULL,
 
-    -- Endereço (opcional), preenchido pela busca de CEP no cadastro
+  
     cep VARCHAR(9) NULL,
     logradouro VARCHAR(150) NULL,
     bairro VARCHAR(100) NULL,
@@ -56,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
         ON UPDATE CASCADE
 );
 
--- Usuário administrador padrão (senha: caio123)
+
 INSERT IGNORE INTO Usuario (
     nome,
     email,
@@ -79,7 +61,7 @@ CREATE TABLE IF NOT EXISTS Trem (
     numero_vagoes INT NOT NULL,
     id_usuario INT NULL,
 
-    -- Se o usuário responsável for excluído, o trem fica sem responsável (NULL)
+
     CONSTRAINT fk_trem_usuario
         FOREIGN KEY (id_usuario)
         REFERENCES Usuario(id_usuario)
@@ -95,7 +77,6 @@ CREATE TABLE IF NOT EXISTS Sensor (
     empresa_operadora VARCHAR(100) NOT NULL,
     id_trem INT NOT NULL,
 
-    -- RESTRICT: não deixa excluir um trem que ainda tem sensores
     CONSTRAINT sensor_ibfk_1
         FOREIGN KEY (id_trem)
         REFERENCES Trem(id_trem)
@@ -122,14 +103,14 @@ CREATE TABLE IF NOT EXISTS Historico_Rota (
     id_trem INT NOT NULL,
     id_rota INT NOT NULL,
 
-    -- RESTRICT: não deixa excluir um trem que está em alguma rota
+
     CONSTRAINT historico_rota_ibfk_1
         FOREIGN KEY (id_trem)
         REFERENCES Trem(id_trem)
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
 
-    -- CASCADE: excluir a rota apaga só o vínculo dela com o trem
+
     CONSTRAINT historico_rota_ibfk_2
         FOREIGN KEY (id_rota)
         REFERENCES Rota(id_rota)
@@ -166,14 +147,6 @@ CREATE TABLE IF NOT EXISTS Manutencao (
 );
 
 
--- ============================================================
--- PARTE 2: atualização de bancos antigos
--- Em um banco novo, estes comandos não mudam nada.
--- Em um banco antigo, completam o que falta SEM apagar dados.
--- ============================================================
-
--- 1) Acentos: converte o banco e as tabelas antigas (latin1) para utf8mb4.
---    Os textos já gravados são convertidos junto, sem perda.
 ALTER DATABASE rail_view_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Perfil         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Usuario        CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -184,8 +157,7 @@ ALTER TABLE Historico_Rota CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 ALTER TABLE Alerta         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Manutencao     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 2) Endereço do usuário (usado no cadastro com CEP e no Perfil).
---    IF NOT EXISTS: só cria a coluna se ela ainda não existir.
+
 ALTER TABLE Usuario
     ADD COLUMN IF NOT EXISTS cep VARCHAR(9) NULL AFTER id_perfil,
     ADD COLUMN IF NOT EXISTS logradouro VARCHAR(150) NULL AFTER cep,
@@ -193,19 +165,16 @@ ALTER TABLE Usuario
     ADD COLUMN IF NOT EXISTS cidade VARCHAR(100) NULL AFTER bairro,
     ADD COLUMN IF NOT EXISTS uf CHAR(2) NULL AFTER cidade;
 
--- 3) Responsável pelo trem (usado na lista, no cadastro e na edição de trens).
 ALTER TABLE Trem
     ADD COLUMN IF NOT EXISTS id_usuario INT NULL AFTER numero_vagoes;
 
--- Se algum trem apontar para um usuário que não existe mais, fica sem responsável.
--- (Sem isso, a chave estrangeira abaixo não poderia ser criada.)
+
 UPDATE Trem
 SET id_usuario = NULL
 WHERE id_usuario IS NOT NULL
   AND id_usuario NOT IN (SELECT id_usuario FROM Usuario);
 
--- 4) Regras de exclusão das chaves estrangeiras.
---    Para mudar a regra, removemos a chave (se existir) e criamos de novo.
+
 ALTER TABLE Trem DROP FOREIGN KEY IF EXISTS fk_trem_usuario;
 ALTER TABLE Trem
     ADD CONSTRAINT fk_trem_usuario
@@ -229,3 +198,66 @@ ALTER TABLE Historico_Rota
         REFERENCES Trem(id_trem)
         ON DELETE RESTRICT
         ON UPDATE CASCADE;
+
+
+
+USE rail_view_db;
+
+
+INSERT INTO Usuario (nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf) VALUES
+('Joao Silva', 'joao@railview.com', '123456', 2, '89201000', 'Rua das Flores', 'Centro', 'Joinville', 'SC'),
+('Maria Oliveira', 'maria@email.com', '123456', 3, '89202000', 'Rua Brasil', 'América', 'Joinville', 'SC'),
+('Pedro Santos', 'pedro@email.com', '123456', 3, '89203000', 'Rua XV de Novembro', 'Atiradores', 'Joinville', 'SC'),
+('Ana Costa', 'ana@railview.com', '123456', 2, '89204000', 'Rua Blumenau', 'Centro', 'Joinville', 'SC'),
+('Lucas Ferreira', 'lucas@email.com', '123456', 3, '89205000', 'Rua São Paulo', 'Bucarein', 'Joinville', 'SC');
+
+
+INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario) VALUES
+('Expresso Norte', 'Passageiros', 'Rail Brasil', 'Siemens Vectron', 8, 2),
+('Carga Pesada', 'Carga', 'TransLog', 'GE Evolution', 20, 2),
+('Expresso Sul', 'Passageiros', 'Rail Brasil', 'Alstom Coradia', 6, 3),
+('Trem Regional', 'Passageiros', 'Ferrovia Sul', 'CAF Civity', 5, 4),
+('Carga Express', 'Carga', 'TransLog', 'EMD SD70', 18, 5);
+
+
+INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem) VALUES
+('Velocidade', 'Vagao 01', 'Ativo', 'Rail Brasil', 1),
+('Temperatura', 'Motor principal', 'Ativo', 'Rail Brasil', 1),
+('GPS', 'Cabine', 'Ativo', 'Rail Brasil', 1),
+('Pressao', 'Sistema de freios', 'Manutencao', 'TransLog', 2),
+('Velocidade', 'Vagao 05', 'Ativo', 'TransLog', 2),
+('GPS', 'Cabine', 'Ativo', 'Rail Brasil', 3),
+('Temperatura', 'Motor principal', 'Inativo', 'Ferrovia Sul', 4),
+('Vibracao', 'Eixo traseiro', 'Ativo', 'TransLog', 5);
+
+INSERT INTO Rota (nome_rota, origem, destino, apelido, operadora, inicio_previsto, fim_previsto, relatorio) VALUES
+('Rota Norte', 'Joinville', 'Curitiba', 'Linha Norte', 'Rail Brasil', '2026-11-11 08:00:00', '2026-11-11 11:00:00', 'Viagem dentro da normalidade.'),
+('Rota Sul', 'Joinville', 'Florianopolis', 'Linha Sul', 'Ferrovia Sul', '2026-11-11 09:00:00', '2026-11-11 14:00:00', 'Operacao sem ocorrencias.'),
+('Rota Industrial', 'Curitiba', 'Sao Paulo', 'Linha Industrial', 'TransLog', '2026-11-11 10:00:00', '2026-11-11 18:00:00', 'Transporte de carga industrial.'),
+('Rota Litoranea', 'Itajai', 'Joinville', 'Linha Litoranea', 'Rail Brasil', '2026-11-12 07:00:00', '2026-11-12 10:00:00', 'Rota com monitoramento ativo.'),
+('Rota Central', 'Sao Paulo', 'Campinas', 'Linha Central', 'TransLog', '2026-11-12 13:00:00', '2026-11-12 16:00:00', 'Transporte realizado normalmente.');
+
+INSERT INTO Historico_Rota (data_inicio, data_fim, id_trem, id_rota) VALUES
+('2026-11-10 08:00:00', '2026-11-10 11:00:00', 1, 1),
+('2026-11-10 09:00:00', '2026-11-10 14:00:00', 3, 2),
+('2026-11-10 10:00:00', '2026-11-10 18:00:00', 2, 3),
+('2026-11-10 07:00:00', '2026-11-10 10:00:00', 4, 4),
+('2026-11-10 13:00:00', '2026-11-10 16:00:00', 5, 5);
+
+
+INSERT INTO Alerta (mensagem, data_alerta, nivel, id_sensor) VALUES
+('Velocidade acima do limite permitido.', '2026-11-11 08:30:00', 'Alto', 1),
+('Temperatura elevada no motor.', '2026-11-11 08:45:00', 'Medio', 2),
+('Falha na comunicacao GPS.', '2026-11-11 09:00:00', 'Alto', 3),
+('Pressao baixa no sistema de freios.', '2026-11-11 09:15:00', 'Critico', 4),
+('Vibracao acima do padrao.', '2026-11-11 09:30:00', 'Medio', 8),
+('Sensor de temperatura inativo.', '2026-11-11 10:00:00', 'Baixo', 7);
+
+
+INSERT INTO Manutencao (data_inicio, data_fim, descricao, id_trem) VALUES
+('2026-10-01', '2026-10-03', 'Revisao geral do motor.', 1),
+('2026-10-05', '2026-10-06', 'Substituicao do sistema de freios.', 2),
+('2026-10-08', '2026-10-09', 'Inspecao dos sistemas eletricos.', 3),
+('2026-10-12', '2026-10-14', 'Manutencao preventiva dos vagoes.', 4),
+('2026-10-15', '2026-10-17', 'Reparo no sistema de transmissao.', 5),
+('2026-11-11', NULL, 'Manutencao corretiva em andamento.', 2);

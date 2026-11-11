@@ -4,7 +4,7 @@ $host = "localhost";
 $usuario = "root";
 $senha = "";
 $banco = "rail_view_db";
-$porta = 3306;
+$porta = 3307;
 
 // No PHP 8, se a conexão falhar o mysqli lança uma exceção.
 // O try/catch "segura" esse erro e mostra uma mensagem amigável,
