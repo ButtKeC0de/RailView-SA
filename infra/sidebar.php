@@ -20,7 +20,7 @@ $ativoSensores = strpos($paginaAtual, 'sensor_') === 0 ? 'ativo' : '';
         <a href="trens_home.php" title="Trens" class="<?= $ativoTrens ?>">
             <img src="../Assets/logos/icon_trem.png" alt="Trens">
         </a>
-        <a href="sensor_home.php" title="Sensores" class="<?= $ativoSensores ?>">
+        <a href="Sensor_lista.php" title="Sensores" class="<?= $ativoSensores ?>">
             <img src="../Assets/logos/icon_sensores.png" alt="Sensores">
         </a>
     </nav>
