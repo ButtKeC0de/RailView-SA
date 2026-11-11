@@ -3,7 +3,6 @@ require_once '../infra/auth.php';
 
 exigir_admin();
 
-// Variáveis do formulário (começam vazias).
 $erro = '';
 $nome = '';
 $email = '';
@@ -15,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $confirmaSenha = $_POST['confirmaSenha'] ?? '';
 
-    // Endereço (opcional). Se vier vazio, guardamos NULL no banco.
     $cep = trim($_POST['cep'] ?? '');
     $logradouro = trim($_POST['logradouro'] ?? '');
     $bairro = trim($_POST['bairro'] ?? '');
@@ -24,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $id_perfil = filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT);
 
-    // Validações: a primeira que falhar define a mensagem de erro.
     if ($nome === '' || $email === '' || $senha === '') {
         $erro = 'Preencha todos os campos.';
 
@@ -41,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = 'As senhas não coincidem.';
 
     } elseif ($cep !== '' && !preg_match('/^\d{5}-?\d{3}$/', $cep)) {
-        // Aceita 00000-000 ou 00000000
         $erro = 'CEP inválido. Use o formato 00000-000.';
 
     } elseif ($uf !== '' && !preg_match('/^[A-Z]{2}$/', $uf)) {
@@ -51,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = 'Perfil inválido.';
 
     } else {
-        // Confere se o email já está em uso.
         $stmt = $conexao->prepare("SELECT id_usuario FROM Usuario WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -64,10 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($erro === '') {
-        // Nunca salvamos a senha pura: password_hash gera uma versão criptografada.
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-        // Campo vazio vira NULL (o operador ?: troca '' por null).
         $cep = $cep ?: null;
         $logradouro = $logradouro ?: null;
         $bairro = $bairro ?: null;
