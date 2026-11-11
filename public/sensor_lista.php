@@ -9,7 +9,7 @@ if (isset($_SESSION['mensagem'])) {
     unset($_SESSION['mensagem']);
 }
 
-// Se vier ?id=5 na URL (clique num sensor da tela anterior), mostra só esse sensor.
+
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 $select = "SELECT
@@ -25,7 +25,7 @@ $select = "SELECT
            LEFT JOIN Trem t ON s.id_trem = t.id_trem";
 
 if ($id) {
-    // Busca um sensor só (consulta preparada, porque usa dado da URL).
+
     $stmt = $conexao->prepare($select . " WHERE s.id_sensor = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();

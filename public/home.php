@@ -60,7 +60,7 @@ $totalSensores = contar_registros($conexao, 'Sensor');
                     <span class="atalho-seta" aria-hidden="true">&rarr;</span>
                 </a>
 
-                <a class="atalho" href="sensor_home.php">
+                <a class="atalho" href="Sensor_lista.php">
                     <img src="../Assets/logos/icon_sensores.png" alt="">
                     <div>
                         <h2>Sensores</h2>
