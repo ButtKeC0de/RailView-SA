@@ -137,17 +137,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
     <link rel="stylesheet" href="../Assets/css/trem.css">
-    <link rel="stylesheet" href="../Assets/css/home.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 <body>
 
 <div class="app-container">
     <?php require '../infra/sidebar.php'; ?>
+    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
     <main class="content">
         <section class="painel-cadastro">

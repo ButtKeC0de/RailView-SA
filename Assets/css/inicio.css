@@ -1,0 +1,191 @@
+/* Página inicial do sistema (public/home.php) */
+:root {
+    --laranja: #df9b49;
+    --grafite: #31384a;
+    --fundo: #e6e9ed;
+    --texto: #242832;
+    --texto-suave: #717784;
+    --sombra: 0 14px 35px rgba(32, 38, 52, 0.12);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
+    color: var(--texto);
+    background: var(--fundo);
+}
+
+.conteudo {
+    min-height: 100vh;
+    padding: 34px clamp(24px, 4vw, 64px) 50px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.85), transparent 34%),
+        var(--fundo);
+}
+
+.topo,
+.atalhos,
+.clima-card {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.topo {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.subtitulo {
+    margin-bottom: 3px;
+    color: var(--texto-suave);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.titulo_home {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+/* Atalhos para os módulos */
+.atalhos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.atalho {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+    color: #ffffff;
+    background: var(--grafite);
+    border-radius: 20px;
+    box-shadow: var(--sombra);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.atalho:hover,
+.atalho:focus-visible {
+    color: #ffffff;
+    outline: none;
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(32, 38, 52, 0.2);
+}
+
+.atalho img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.atalho h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+
+.atalho p {
+    color: #bdc3d1;
+    font-size: 0.9rem;
+}
+
+.atalho-seta {
+    margin-left: auto;
+    color: var(--laranja);
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.atalho:hover .atalho-seta {
+    transform: translateX(4px);
+}
+
+/* Card do clima (API Open-Meteo) */
+.clima-card {
+    padding: 28px;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: var(--sombra);
+}
+
+.clima-label {
+    color: var(--laranja);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.clima-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 4px 0;
+}
+
+#clima-local,
+#clima-atualizacao {
+    color: var(--texto-suave);
+    font-size: 14px;
+}
+
+.clima-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 22px 0;
+}
+
+#clima-icone {
+    font-size: 42px;
+}
+
+#clima-temperatura {
+    font-size: 38px;
+    font-weight: 600;
+}
+
+#clima-condicao {
+    color: var(--texto-suave);
+}
+
+@media (max-width: 900px) {
+    .atalhos {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .conteudo {
+        padding: 24px 16px 105px;
+    }
+
+    .subtitulo {
+        display: none;
+    }
+
+    .clima-card {
+        padding: 20px;
+    }
+
+    #clima-temperatura {
+        font-size: 30px;
+    }
+}

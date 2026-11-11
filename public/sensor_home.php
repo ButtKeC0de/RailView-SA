@@ -20,7 +20,7 @@ $resultado = $conexao->query($sql);
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/css/painel.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
@@ -37,15 +37,7 @@ $resultado = $conexao->query($sql);
 
             <h1 class="titulo_home"> Sensores cadastrados </h1>
 
-            <a class="usuario text-decoration-none" href="Perfil.php" title="Meu perfil">
-
-                <div class="foto_usuario">
-                    <i class="bi bi-person-fill"></i>
-                </div>
-
-                <span class="nome_usuario"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Entrar') ?></span>
-
-            </a>
+            <?php require '../infra/usuario_topo.php'; ?>
 
         </div>
 
@@ -74,13 +66,32 @@ $resultado = $conexao->query($sql);
                         <p>ID:<?= (int)$sensor['id_sensor'] ?></p>
                         <p> <?= htmlspecialchars($sensor['localizacao'],ENT_QUOTES, 'UTF-8' ) ?></p>
 
+                        <?php
+                        // Cor do status: verde = Ativo, vermelho = Inativo, amarelo = Manutenção.
+                        $classeStatus = 'status-ativo';
+                        if ($sensor['status_sensor'] === 'Inativo') {
+                            $classeStatus = 'status-inativo';
+                        } elseif ($sensor['status_sensor'] === 'Manutenção') {
+                            $classeStatus = 'status-manutencao';
+                        }
+                        ?>
+                        <span class="status-sensor <?= $classeStatus ?>"><?= htmlspecialchars($sensor['status_sensor']) ?></span>
+
                     </div>
 
                 <?php endwhile; ?>
 
             <?php else: ?>
 
-                <p style="grid-column: 1 / -1; text-align: center;"> Nenhum sensor cadastrado. </p>
+                <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
+                <div class="estado-vazio estado-vazio--escuro" style="grid-column: 1 / -1;">
+                    <div class="estado-vazio-icone"><i class="bi bi-broadcast"></i></div>
+                    <h3>Nenhum sensor cadastrado</h3>
+                    <p>Os sensores cadastrados vão aparecer aqui.</p>
+                    <?php if (eh_admin()): ?>
+                        <a href="sensor_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro sensor</a>
+                    <?php endif; ?>
+                </div>
 
             <?php endif; ?>
 
@@ -104,24 +115,11 @@ $resultado = $conexao->query($sql);
 
             <div class="card_acao">
 
-                <h2>
-                    Editar sensor
-                </h2>
+                <h2> Gerenciar sensores </h2>
 
+                <!-- Na lista dá para editar e excluir -->
                 <form action="sensor_lista.php" method="get">
-                    <button type="submit"class="botao_laranja"> Editar</button>
-                </form>
-
-            </div>
-
-            <div class="card_acao">
-
-                <h2>
-                    Excluir sensor
-                </h2>
-
-                <form action="sensor_lista.php" method="get">
-                    <button type="submit" class="botao_laranja">Excluir </button>
+                    <button type="submit" class="botao_laranja"> Gerenciar </button>
                 </form>
 
             </div>
@@ -144,7 +142,7 @@ $resultado = $conexao->query($sql);
 
             <div class="card_mapa">
 
-                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-49.42%2C-25.62%2C-49.16%2C-25.36&layer=mapnik" title="Mapa"></iframe>
+                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-48.98%2C-26.43%2C-48.72%2C-26.18&layer=mapnik" title="Mapa"></iframe>
 
             </div>
 

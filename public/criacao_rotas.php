@@ -158,7 +158,7 @@ $editando = !empty($rotaForm['id_rota']);
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="../Assets/css/rotas.css">
@@ -179,12 +179,7 @@ $editando = !empty($rotaForm['id_rota']);
                     <h1 class="titulo_home">Cadastro de Rota</h1>
                 </div>
 
-                <a class="usuario" href="Perfil.php" title="Meu perfil">
-                    <div class="foto_usuario" aria-hidden="true">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    <span class="nome_usuario"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Entrar') ?></span>
-                </a>
+                <?php require '../infra/usuario_topo.php'; ?>
             </header>
 
             <section id="rotas_cadastradas" aria-label="Cadastro e listagem de rotas">

@@ -19,7 +19,7 @@ $resultado = $conexao->query($sql);
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/css/painel.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
@@ -36,10 +36,7 @@ $resultado = $conexao->query($sql);
 
             <h1 class="titulo_home"> Trens cadastrados</h1>
 
-            <a class="usuario text-decoration-none" href="Perfil.php" title="Meu perfil">
-                <div class="foto_usuario"><i class="bi bi-person-fill"></i></div>
-                <span class="nome_usuario"><?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Entrar') ?></span>
-            </a>
+            <?php require '../infra/usuario_topo.php'; ?>
 
         </div>
 
@@ -72,7 +69,15 @@ $resultado = $conexao->query($sql);
 
             <?php else: ?>
 
-                <p style="grid-column: 1 / -1;text-align: center;">Nenhum trem cadastrado.</p>
+                <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
+                <div class="estado-vazio estado-vazio--escuro" style="grid-column: 1 / -1;">
+                    <div class="estado-vazio-icone"><i class="bi bi-train-front"></i></div>
+                    <h3>Nenhum trem cadastrado</h3>
+                    <p>Os trens cadastrados vão aparecer aqui.</p>
+                    <?php if (eh_admin()): ?>
+                        <a href="trens_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro trem</a>
+                    <?php endif; ?>
+                </div>
 
             <?php endif; ?>
 
@@ -94,20 +99,11 @@ $resultado = $conexao->query($sql);
 
             <div class="card_acao">
 
-                <h2> Editar trem </h2>
+                <h2> Gerenciar trens </h2>
 
-                <form action="trens_lista.php" method="get" >
-                    <button type="submit"class="botao_laranja">Editar</button>
-                </form>
-
-            </div>
-
-            <div class="card_acao">
-
-                <h2> Excluir trem</h2>
-
-                <form action="trens_lista.php"method="get">
-                    <button type="submit"class="botao_laranja"> Excluir</button>
+                <!-- Na lista dá para editar e excluir -->
+                <form action="trens_lista.php" method="get">
+                    <button type="submit" class="botao_laranja"> Gerenciar </button>
                 </form>
 
             </div>
@@ -129,7 +125,7 @@ $resultado = $conexao->query($sql);
             <div class="card_mapa">
 
                 <iframe
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=-49.42%2C-25.62%2C-49.16%2C-25.36&layer=mapnik"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-48.98%2C-26.43%2C-48.72%2C-26.18&layer=mapnik"
                     title="Mapa das rotas"
                 ></iframe>
 

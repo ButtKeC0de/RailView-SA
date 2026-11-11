@@ -1,5 +1,6 @@
 <?php
 $paginaAtual = basename($_SERVER['PHP_SELF']);
+$ativoHome = $paginaAtual === 'home.php' ? 'ativo' : '';
 $ativoRotas = strpos($paginaAtual, 'criacao_rotas') === 0 ? 'ativo' : '';
 $ativoTrens = strpos($paginaAtual, 'trens_') === 0 ? 'ativo' : '';
 $ativoSensores = strpos($paginaAtual, 'sensor_') === 0 ? 'ativo' : '';
@@ -10,6 +11,9 @@ $ativoSensores = strpos($paginaAtual, 'sensor_') === 0 ? 'ativo' : '';
     </a>
 
     <nav class="sidebar-nav">
+        <a href="home.php" title="Início" class="<?= $ativoHome ?>">
+            <img src="../Assets/logos/home.png" alt="Início">
+        </a>
         <a href="criacao_rotas.php" title="Rotas" class="<?= $ativoRotas ?>">
             <img src="../Assets/logos/icon_rotas.png" alt="Rotas">
         </a>

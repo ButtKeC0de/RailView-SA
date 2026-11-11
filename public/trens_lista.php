@@ -51,20 +51,20 @@ if (isset($stmt)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="../Assets/css/trem.css">
-    <link rel="stylesheet" href="../Assets/css/home.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 <body>
 
 <div class="app-container">
     <?php require '../infra/sidebar.php'; ?>
+    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
     <main class="content">
         <section class="painel-cadastro">
@@ -86,6 +86,11 @@ if (isset($stmt)) {
                 unset($_SESSION['mensagem']);
             }
             ?>
+
+            <?php if ($id): ?>
+                <!-- Está mostrando só um trem: oferece voltar para a lista completa -->
+                <p class="mb-3"><a href="trens_lista.php" class="btn btn-dark btn-sm rounded-pill px-3">&larr; Ver todos os trens</a></p>
+            <?php endif; ?>
 
             <div class="table-responsive rounded-4 shadow-sm">
                 <table class="table table-hover align-middle m-0 text-center custom-table">
@@ -134,8 +139,24 @@ if (isset($stmt)) {
                                         ) ?>
                                     </td>
 
+                                    <?php
+                                    // Escolhe a cor da etiqueta pelo tipo do trem.
+                                    // mb_strtolower deixa tudo minúsculo; str_contains procura a palavra.
+                                    $tipoMinusculo = mb_strtolower($trem['tipo_trem']);
+
+                                    if (str_contains($tipoMinusculo, 'carga')) {
+                                        $classeTipo = 'tipo-carga';
+                                    } elseif (str_contains($tipoMinusculo, 'passag')) {
+                                        $classeTipo = 'tipo-passageiros';
+                                    } elseif (str_contains($tipoMinusculo, 'misto')) {
+                                        $classeTipo = 'tipo-misto';
+                                    } else {
+                                        $classeTipo = 'tipo-outro';
+                                    }
+                                    ?>
+
                                     <td>
-                                        <span class="badge bg-secondary">
+                                        <span class="badge badge-tipo <?= $classeTipo ?>">
                                             <?= htmlspecialchars(
                                                 $trem['tipo_trem'],
                                                 ENT_QUOTES,
@@ -166,14 +187,14 @@ if (isset($stmt)) {
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
 
-                                            <a
-                                                href="trens_excluir.php?id=<?= (int)$trem['id_trem'] ?>"
-                                                class="btn btn-danger btn-sm rounded-3"
-                                                onclick="return confirm('Tem certeza que deseja excluir este trem?');"
-                                                title="Excluir"
-                                            >
-                                                <i class="bi bi-trash-fill"></i>
-                                            </a>
+                                            <!-- Excluir usa formulário POST: só apaga ao clicar no botão -->
+                                            <form action="trens_excluir.php" method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Tem certeza que deseja excluir este trem?');">
+                                                <input type="hidden" name="id" value="<?= (int)$trem['id_trem'] ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-3" title="Excluir">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
@@ -184,9 +205,17 @@ if (isset($stmt)) {
                             <tr>
                                 <td
                                     colspan="<?= eh_admin() ? 7 : 6 ?>"
-                                    class="text-muted py-4"
+                                    class="p-0"
                                 >
-                                    Nenhum trem cadastrado até o momento.
+                                    <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
+                                    <div class="estado-vazio">
+                                        <div class="estado-vazio-icone"><i class="bi bi-train-front"></i></div>
+                                        <h3><?= $id ? 'Trem não encontrado' : 'Nenhum trem cadastrado' ?></h3>
+                                        <p>Os trens cadastrados vão aparecer aqui.</p>
+                                        <?php if (eh_admin()): ?>
+                                            <a href="trens_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro trem</a>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
 
