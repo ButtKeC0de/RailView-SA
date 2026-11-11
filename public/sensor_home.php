@@ -67,7 +67,6 @@ $resultado = $conexao->query($sql);
                         <p> <?= htmlspecialchars($sensor['localizacao'],ENT_QUOTES, 'UTF-8' ) ?></p>
 
                         <?php
-                        // Cor do status: verde = Ativo, vermelho = Inativo, amarelo = Manutenção.
                         $classeStatus = 'status-ativo';
                         if ($sensor['status_sensor'] === 'Inativo') {
                             $classeStatus = 'status-inativo';
@@ -114,7 +113,6 @@ $resultado = $conexao->query($sql);
 
                 <h2> Gerenciar sensores </h2>
 
-                <!-- Na lista dá para editar e excluir -->
                 <form action="sensor_lista.php" method="get">
                     <button type="submit" class="botao_laranja"> Gerenciar </button>
                 </form>
