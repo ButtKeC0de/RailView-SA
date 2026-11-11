@@ -4,7 +4,6 @@ exigir_admin();
 
 $mensagem = "";
 
-// Lista de trens para o <select> do formulário.
 $trens = [];
 $resultTrens = $conexao->query("SELECT id_trem, apelido, modelo FROM Trem ORDER BY apelido ASC");
 if ($resultTrens) {
@@ -14,15 +13,12 @@ if ($resultTrens) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // trim() tira espaços sobrando no começo e no fim.
     $tipo_sensor       = trim($_POST['tipo_sensor'] ?? '');
     $localizacao       = trim($_POST['localizacao'] ?? '');
     $empresa_operadora = trim($_POST['empresa_operadora'] ?? '');
     $status_sensor     = $_POST['status_sensor'] ?? 'Ativo';
-    // FILTER_VALIDATE_INT: só aceita número inteiro. Qualquer outra coisa vira false.
     $id_trem           = filter_input(INPUT_POST, 'id_trem', FILTER_VALIDATE_INT);
 
-    // Só aceita os 3 status que existem no <select>.
     $statusPermitidos = ['Ativo', 'Inativo', 'Manutenção'];
 
     if ($tipo_sensor === '' || $localizacao === '' || $empresa_operadora === '' || !$id_trem) {
@@ -32,7 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensagem = mensagem('danger', 'Status do sensor inválido.');
 
     } else {
-        // Confere se o trem escolhido existe mesmo no banco.
         $stmt = $conexao->prepare("SELECT id_trem FROM Trem WHERE id_trem = ?");
         $stmt->bind_param("i", $id_trem);
         $stmt->execute();
@@ -54,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
 
-            // Mensagem genérica: não mostramos o erro do banco para o usuário.
             $mensagem = mensagem('danger', 'Não foi possível cadastrar o sensor. Tente novamente.');
             $stmt->close();
         }
