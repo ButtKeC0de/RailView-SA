@@ -37,88 +37,56 @@ $endereco = $partesEndereco ? implode(', ', $partesEndereco) : 'Não informado';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="../Assets/css/trem.css">
+    <link rel="stylesheet" href="../Assets/css/conta.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 
-<body>
-
-    <div class="app-container">
-
+<body class="conta">
+    <div class="tela">
         <?php require '../infra/sidebar.php'; ?>
-    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
+        <main class="conteudo">
+            <header class="conta-topo">
+                <h1>Meu Perfil</h1>
+                <?php require '../infra/usuario_topo.php'; ?>
+            </header>
 
-        <main class="content">
+            <?php if (isset($_SESSION['mensagem'])): ?>
+                <div class="conta-mensagem" role="status">
+                    <?= $_SESSION['mensagem']; ?>
+                    <?php unset($_SESSION['mensagem']); ?>
+                </div>
+            <?php endif; ?>
 
-            <section class="painel-cadastro">
-
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                    <h1 class="titulo m-0">Meu Perfil</h1>
-                    <div class="d-flex flex-wrap gap-2">
+            <section class="conta-painel" aria-labelledby="dados-conta">
+                <div class="conta-cabecalho">
+                    <h2 id="dados-conta">Dados da conta</h2>
+                    <div class="conta-acoes">
                         <?php if (eh_admin()): ?>
-                            <a href="usuario_lista.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                                <i class="bi bi-people-fill"></i> Gerenciar usuários
-                            </a>
+                            <a class="conta-botao conta-secundario" href="usuario_lista.php">Gerenciar usuários</a>
                         <?php endif; ?>
-                        <a href="usuario_editar.php?id=<?= (int)$usuario['id_usuario'] ?>" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                            <i class="bi bi-pencil-fill"></i> Editar meus dados
-                        </a>
+                        <a class="conta-botao conta-primario" href="usuario_editar.php?id=<?= (int)$usuario['id_usuario'] ?>">Editar meus dados</a>
                     </div>
                 </div>
-
-                <?php
-                if (isset($_SESSION['mensagem'])) {
-                    echo $_SESSION['mensagem'];
-                    unset($_SESSION['mensagem']);
-                }
-                ?>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="card-input">
-                            <label for="nome">Nome</label>
-                            <input type="text" id="nome" value="<?= htmlspecialchars($usuario['nome']) ?>" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card-input">
-                            <label for="email">Email</label>
-                            <input type="text" id="email" value="<?= htmlspecialchars($usuario['email']) ?>" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card-input">
-                            <label for="perfil">Perfil</label>
-                            <input type="text" id="perfil" value="<?= htmlspecialchars($usuario['nome_perfil']) ?>" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card-input">
-                            <label for="endereco">Endereço</label>
-                            <input type="text" id="endereco" value="<?= htmlspecialchars($endereco) ?>" readonly>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 d-flex justify-content-center align-items-center">
-                        <form action="usuario_excluir.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.');">
-                            <input type="hidden" name="id_usuario" value="<?= (int)$usuario['id_usuario'] ?>">
-                            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2">
-                                <i class="bi bi-trash-fill"></i> Excluir minha conta
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
+                <dl class="conta-dados">
+                    <div><dt>Nome</dt><dd><?= htmlspecialchars($usuario['nome']) ?></dd></div>
+                    <div><dt>E-mail</dt><dd><?= htmlspecialchars($usuario['email']) ?></dd></div>
+                    <div><dt>Perfil de acesso</dt><dd><span class="conta-etiqueta"><?= htmlspecialchars($usuario['nome_perfil']) ?></span></dd></div>
+                    <div><dt>Endereço</dt><dd><?= htmlspecialchars($endereco) ?></dd></div>
+                </dl>
             </section>
 
+            <section class="conta-painel conta-exclusao" aria-labelledby="excluir-conta">
+                <div>
+                    <h2 id="excluir-conta">Excluir minha conta</h2>
+                    <p>Esta ação remove permanentemente seus dados de acesso.</p>
+                </div>
+                <form action="usuario_excluir.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.');">
+                    <input type="hidden" name="id_usuario" value="<?= (int)$usuario['id_usuario'] ?>">
+                    <button type="submit" class="conta-botao conta-perigo">Excluir minha conta</button>
+                </form>
+            </section>
         </main>
-
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

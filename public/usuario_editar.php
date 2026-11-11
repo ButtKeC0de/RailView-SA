@@ -112,104 +112,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../Assets/css/trem.css">
+    <link rel="stylesheet" href="../Assets/css/conta.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 
-<body>
-
-    <div class="app-container">
-
+<body class="conta">
+    <div class="tela">
         <?php require '../infra/sidebar.php'; ?>
-    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
-
-        <main class="content">
-
-            <section class="painel-cadastro">
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="titulo m-0"><?= $editandoASiMesmo ? 'Editar meus dados' : 'Editar Usuário' ?></h1>
-                    <a href="<?= $voltarPara ?>" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                        ← Voltar
-                    </a>
+        <main class="conteudo">
+            <header class="conta-topo">
+                <h1><?= $editandoASiMesmo ? 'Editar meus dados' : 'Editar usuário' ?></h1>
+                <?php require '../infra/usuario_topo.php'; ?>
+            </header>
+            <section class="conta-painel" aria-labelledby="editar-dados">
+                <div class="conta-cabecalho">
+                    <h2 id="editar-dados">Dados de acesso</h2>
+                    <a href="<?= $voltarPara ?>" class="conta-link">← Voltar</a>
                 </div>
-
-                <?php if (!empty($mensagem)) echo $mensagem; ?>
-
+                <?php if (!empty($mensagem)): ?>
+                    <div role="alert"><?= $mensagem ?></div>
+                <?php endif; ?>
                 <form action="" method="POST">
-                    <div class="row g-4 align-items-center">
-
-                        <div class="col-lg-8">
-
-                            <div class="row g-4">
-
-                                <div class="col-md-6">
-                                    <div class="card-input">
-                                        <label for="nome">Nome</label>
-                                        <input type="text" id="nome" name="nome" maxlength="100" value="<?= htmlspecialchars($usuario['nome']) ?>" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="card-input">
-                                        <label for="email">Email</label>
-                                        <input type="email" id="email" name="email" maxlength="100" value="<?= htmlspecialchars($usuario['email']) ?>" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="card-input">
-                                        <label for="nova_senha">Nova senha</label>
-                                        <input type="password" id="nova_senha" name="nova_senha" minlength="8" placeholder="Deixe vazio para manter" autocomplete="new-password">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="card-input">
-                                        <label for="confirma_senha">Confirmar nova senha</label>
-                                        <input type="password" id="confirma_senha" name="confirma_senha" minlength="8" placeholder="Repita a nova senha" autocomplete="new-password">
-                                    </div>
-                                </div>
-
-                                <?php if (eh_admin()): ?>
-                                <div class="col-md-12">
-                                    <div class="card-input">
-                                        <label for="id_perfil">Perfil</label>
-                                        <select id="id_perfil" name="id_perfil" class="form-select border-0 text-center" style="background-color: #df9b49; font-weight: bold; border-radius: 25px; width: 90%;" required>
-                                            <?php foreach ($perfis as $perfil): ?>
-                                                <option value="<?= (int)$perfil['id_perfil'] ?>" <?= (int)$usuario['id_perfil'] === (int)$perfil['id_perfil'] ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($perfil['nome_perfil']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <?php endif; ?>
-
-                            </div>
-
+                    <div class="conta-campos">
+                        <div class="conta-campo">
+                            <label for="nome">Nome</label>
+                            <input type="text" id="nome" name="nome" maxlength="100" value="<?= htmlspecialchars($usuario['nome']) ?>" autocomplete="name" required>
                         </div>
-
-                        <div class="col-lg-4 d-flex justify-content-center align-items-center">
-
-                            <div class="botao-container">
-                                <button type="submit" class="btn-enviar">
-                                    Salvar
-                                </button>
-                            </div>
-
+                        <div class="conta-campo">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email" maxlength="100" value="<?= htmlspecialchars($usuario['email']) ?>" autocomplete="email" required>
                         </div>
-
+                        <div class="conta-campo">
+                            <label for="nova_senha">Nova senha</label>
+                            <input type="password" id="nova_senha" name="nova_senha" minlength="8" autocomplete="new-password" aria-describedby="ajuda-senha">
+                            <span id="ajuda-senha" class="conta-ajuda">Deixe em branco para manter a senha atual. Mínimo de 8 caracteres para uma nova senha.</span>
+                        </div>
+                        <div class="conta-campo">
+                            <label for="confirma_senha">Confirmar nova senha</label>
+                            <input type="password" id="confirma_senha" name="confirma_senha" minlength="8" autocomplete="new-password">
+                        </div>
+                        <?php if (eh_admin()): ?>
+                        <div class="conta-campo">
+                            <label for="id_perfil">Perfil de acesso</label>
+                            <select id="id_perfil" name="id_perfil" required>
+                                <?php foreach ($perfis as $perfil): ?>
+                                    <option value="<?= (int)$perfil['id_perfil'] ?>" <?= (int)$usuario['id_perfil'] === (int)$perfil['id_perfil'] ? 'selected' : '' ?>><?= htmlspecialchars($perfil['nome_perfil']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="conta-rodape">
+                        <a href="<?= $voltarPara ?>" class="conta-botao conta-secundario">Cancelar</a>
+                        <button type="submit" class="conta-botao conta-primario">Salvar alterações</button>
                     </div>
                 </form>
-
             </section>
-
         </main>
-
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
