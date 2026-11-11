@@ -7,7 +7,6 @@ const inputDestino = document.getElementById("destino");
 const inputPesquisa = document.getElementById("pesquisarRota");
 const listaRotas = document.getElementById("listaRotas");
 const estadoVazio = document.getElementById("estadoVazio");
-const contadorRotas = document.getElementById("contadorRotas");
 const mensagemFormulario = document.getElementById("mensagemFormulario");
 
 const itensRota = Array.from(listaRotas.querySelectorAll(".rota"));
@@ -38,22 +37,6 @@ function mostrarMensagem(texto, tipo = "") {
     }
 }
 
-function atualizarContador(quantidadeExibida) {
-    const total = itensRota.length;
-
-    if (total === 0) {
-        contadorRotas.textContent = "Nenhuma rota cadastrada";
-        return;
-    }
-
-    if (quantidadeExibida !== total) {
-        contadorRotas.textContent = `${quantidadeExibida} de ${total} rotas encontradas`;
-        return;
-    }
-
-    contadorRotas.textContent = total === 1 ? "1 rota cadastrada" : `${total} rotas cadastradas`;
-}
-
 function filtrarRotas(filtro = "") {
     const termo = normalizarTexto(filtro);
     let quantidadeExibida = 0;
@@ -71,17 +54,13 @@ function filtrarRotas(filtro = "") {
     estadoVazio.classList.toggle("oculto", !semResultados);
 
     const tituloVazio = estadoVazio.querySelector("h3");
-    const descricaoVazia = estadoVazio.querySelector("p");
 
     if (termo && semResultados) {
         tituloVazio.textContent = "Nenhuma rota encontrada";
-        descricaoVazia.textContent = "Tente pesquisar outro trem, origem ou destino.";
     } else {
         tituloVazio.textContent = "Nenhuma rota cadastrada";
-        descricaoVazia.textContent = "As novas rotas aparecerão aqui.";
     }
 
-    atualizarContador(quantidadeExibida);
 }
 
 if (formulario) {

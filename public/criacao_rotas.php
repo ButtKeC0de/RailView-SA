@@ -185,16 +185,11 @@ $editando = !empty($rotaForm['id_rota']);
             <section id="rotas_cadastradas" aria-label="Cadastro e listagem de rotas">
                 <article id="trens" class="card">
                     <div class="card-cabecalho">
-                        <div class="icone-card" aria-hidden="true">
-                            <i class="bi bi-signpost-split-fill"></i>
-                        </div>
                         <div>
                             <?php if (eh_admin()): ?>
                             <h2><?= $editando ? 'Editar Rota #' . (int)$rotaForm['id_rota'] : 'Cadastrar Rota' ?></h2>
-                            <p>Informe os dados do <?= $editando ? 'trajeto' : 'novo trajeto' ?>.</p>
                             <?php else: ?>
                             <h2>Rotas</h2>
-                            <p>Você pode consultar as rotas. Apenas administradores cadastram, editam e excluem.</p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -251,12 +246,11 @@ $editando = !empty($rotaForm['id_rota']);
                     <div class="lista-topo">
                         <div>
                             <h2>Rotas Cadastradas</h2>
-                            <p id="contadorRotas">Nenhuma rota cadastrada</p>
                         </div>
 
                         <label class="pesquisa" for="pesquisarRota">
                             <i class="bi bi-search" aria-hidden="true"></i>
-                            <input type="search" id="pesquisarRota" placeholder="Pesquisar rota">
+                            <input type="search" id="pesquisarRota" placeholder="Pesquisar rota" aria-label="Pesquisar rota por trem, origem ou destino">
                         </label>
                     </div>
 
@@ -291,9 +285,7 @@ $editando = !empty($rotaForm['id_rota']);
                     </div>
 
                     <div id="estadoVazio" class="estado-vazio <?= $rotas ? 'oculto' : '' ?>">
-                        <i class="bi bi-map" aria-hidden="true"></i>
                         <h3>Nenhuma rota cadastrada</h3>
-                        <p>As novas rotas aparecerão aqui.</p>
                     </div>
                 </article>
             </section>
