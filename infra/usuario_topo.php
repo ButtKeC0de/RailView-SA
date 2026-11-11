@@ -1,6 +1,4 @@
 <?php
-// Selo do usuário logado (canto superior direito), igual em todas as páginas.
-// Defina $usuarioFixo = true antes do require para páginas sem cabeçalho próprio.
 $classeUsuario = !empty($usuarioFixo) ? 'usuario-topo usuario-topo--fixo' : 'usuario-topo';
 ?>
 <a class="<?= $classeUsuario ?>" href="Perfil.php" title="Meu perfil">
