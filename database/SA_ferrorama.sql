@@ -1,4 +1,20 @@
-CREATE DATABASE IF NOT EXISTS rail_view_db;
+-- ============================================================
+-- Banco do Rail View
+--
+-- ATENÇÃO: este script APAGA o banco rail_view_db e cria tudo de novo.
+-- Assim, quem importar sempre fica com a versão mais atual das tabelas.
+-- (Os dados cadastrados antes serão perdidos.)
+--
+-- Como usar: phpMyAdmin > Importar > escolher este arquivo > Executar
+-- Login padrão: usuário caio123 / senha caio123 (administrador)
+-- ============================================================
+
+DROP DATABASE IF EXISTS rail_view_db;
+
+-- utf8mb4: guarda acentos (ç, ã, é) e emojis corretamente.
+CREATE DATABASE IF NOT EXISTS rail_view_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 USE rail_view_db;
 
 CREATE TABLE IF NOT EXISTS Perfil (
@@ -20,6 +36,13 @@ CREATE TABLE IF NOT EXISTS Usuario (
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     id_perfil INT NOT NULL,
+
+    -- Endereço (opcional), preenchido pela busca de CEP no cadastro
+    cep VARCHAR(9) NULL,
+    logradouro VARCHAR(150) NULL,
+    bairro VARCHAR(100) NULL,
+    cidade VARCHAR(100) NULL,
+    uf CHAR(2) NULL,
 
     FOREIGN KEY (id_perfil)
         REFERENCES Perfil(id_perfil)
@@ -52,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Trem (
     CONSTRAINT fk_trem_usuario
         FOREIGN KEY (id_usuario)
         REFERENCES Usuario(id_usuario)
-        ON DELETE RESTRICT
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -66,7 +89,7 @@ CREATE TABLE IF NOT EXISTS Sensor (
 
     FOREIGN KEY (id_trem)
         REFERENCES Trem(id_trem)
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
         ON UPDATE CASCADE
 );
 
@@ -91,7 +114,7 @@ CREATE TABLE IF NOT EXISTS Historico_Rota (
 
     FOREIGN KEY (id_trem)
         REFERENCES Trem(id_trem)
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
         ON UPDATE CASCADE,
 
     FOREIGN KEY (id_rota)
