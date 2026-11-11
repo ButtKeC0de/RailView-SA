@@ -1,10 +1,8 @@
 <?php
 require_once '../infra/auth.php';
 
-if (isset($_SESSION['usuario_id'])) {
-    exigir_login();
-}
-$adminCadastrando = eh_admin();
+exigir_admin();
+$adminCadastrando = true;
 
 // Variáveis do formulário (começam vazias).
 $erro = '';
@@ -25,9 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cidade = trim($_POST['cidade'] ?? '');
     $uf = strtoupper(trim($_POST['uf'] ?? ''));
 
-    $id_perfil = $adminCadastrando
-        ? filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT)
-        : PERFIL_USUARIO;
+    $id_perfil = filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT);
 
     // Validações: a primeira que falhar define a mensagem de erro.
     if ($nome === '' || $email === '' || $senha === '') {
@@ -88,12 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         if ($cadastrou) {
-            if ($adminCadastrando) {
-                $_SESSION['mensagem'] = mensagem('success', "Usuário '$nome' cadastrado com sucesso!");
-                header("Location: usuario_lista.php");
-            } else {
-                header("Location: login.php?cadastro=ok");
-            }
+            $_SESSION['mensagem'] = mensagem('success', "Usuário '$nome' cadastrado com sucesso!");
+            header("Location: usuario_lista.php");
             exit();
         }
 

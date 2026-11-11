@@ -47,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$cadastroOk = isset($_GET['cadastro']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -87,8 +86,6 @@ $cadastroOk = isset($_GET['cadastro']);
                     <div style="margin: 0 20px;">
                         <?php if ($erro !== ''): ?>
                             <?= mensagem('danger', $erro) ?>
-                        <?php elseif ($cadastroOk): ?>
-                            <?= mensagem('success', 'Cadastro realizado! Agora é só entrar.') ?>
                         <?php endif; ?>
                     </div>
 
@@ -105,14 +102,6 @@ $cadastroOk = isset($_GET['cadastro']);
                     </label>
 
                     <input class="form_text" type="password" id="senha" placeholder="Senha" required name="senha">
-
-                    <br>
-
-                    <div class="login_1">
-                        <a href="../public/usuario_cadastro.php" id="text_log" style="text-decoration: none; color: inherit; display: block; cursor: pointer; text-align: center;">
-                            Não possui conta? Cadastrar-se
-                        </a>
-                    </div>
 
                     <br>
 
