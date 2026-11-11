@@ -88,7 +88,7 @@ if ($resultado) {
                 <?php endif; ?>
 
                 <div class="mb-4">
-                    <input type="text" id="campoBusca" class="form-control input-busca" placeholder="🔍 Pesquisar por tipo, localização, operadora ou trem...">
+                    <input type="text" id="campoBusca" class="form-control input-busca" placeholder="Pesquisar por tipo, localização, operadora ou trem...">
                 </div>
 
                 <div id="listaSensores">
