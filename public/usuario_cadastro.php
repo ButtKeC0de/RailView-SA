@@ -6,6 +6,11 @@ if (isset($_SESSION['usuario_id'])) {
 }
 $adminCadastrando = eh_admin();
 
+// Variáveis do formulário (começam vazias).
+$erro = '';
+$nome = '';
+$email = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nome = trim($_POST['nome'] ?? '');
@@ -13,70 +18,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $confirmaSenha = $_POST['confirmaSenha'] ?? '';
 
+    // Endereço (opcional). Se vier vazio, guardamos NULL no banco.
+    $cep = trim($_POST['cep'] ?? '');
+    $logradouro = trim($_POST['logradouro'] ?? '');
+    $bairro = trim($_POST['bairro'] ?? '');
+    $cidade = trim($_POST['cidade'] ?? '');
+    $uf = strtoupper(trim($_POST['uf'] ?? ''));
+
     $id_perfil = $adminCadastrando
         ? filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT)
         : PERFIL_USUARIO;
 
+    // Validações: a primeira que falhar define a mensagem de erro.
     if ($nome === '' || $email === '' || $senha === '') {
-        echo "<script>alert('Preencha todos os campos.');</script>";
+        $erro = 'Preencha todos os campos.';
+
+    } elseif (mb_strlen($nome) > 100 || mb_strlen($email) > 100) {
+        $erro = 'Nome e email podem ter no máximo 100 caracteres.';
 
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "<script>alert('Digite um email válido.');</script>";
+        $erro = 'Digite um email válido.';
+
+    } elseif (mb_strlen($senha) < 8) {
+        $erro = 'A senha deve ter no mínimo 8 caracteres.';
 
     } elseif ($senha !== $confirmaSenha) {
-        echo "<script>alert('As senhas não coincidem.');</script>";
+        $erro = 'As senhas não coincidem.';
+
+    } elseif ($cep !== '' && !preg_match('/^\d{5}-?\d{3}$/', $cep)) {
+        // Aceita 00000-000 ou 00000000
+        $erro = 'CEP inválido. Use o formato 00000-000.';
+
+    } elseif ($uf !== '' && !preg_match('/^[A-Z]{2}$/', $uf)) {
+        $erro = 'Estado (UF) deve ter 2 letras, ex: SC.';
 
     } elseif (!in_array($id_perfil, [PERFIL_ADMIN, PERFIL_FUNCIONARIO, PERFIL_USUARIO], true)) {
-        echo "<script>alert('Perfil inválido.');</script>";
+        $erro = 'Perfil inválido.';
 
     } else {
-
-        $stmt = $conexao->prepare(
-            "SELECT id_usuario FROM Usuario WHERE email = ?"
-        );
-
+        // Confere se o email já está em uso.
+        $stmt = $conexao->prepare("SELECT id_usuario FROM Usuario WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        $resultado = $stmt->get_result();
+        $emailEmUso = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
 
-        if ($resultado->num_rows > 0) {
+        if ($emailEmUso) {
+            $erro = 'Este email já está cadastrado.';
+        }
+    }
 
-            echo "<script>alert('Este email já está cadastrado.');</script>";
+    if ($erro === '') {
+        // Nunca salvamos a senha pura: password_hash gera uma versão criptografada.
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-        } else {
+        // Campo vazio vira NULL (o operador ?: troca '' por null).
+        $cep = $cep ?: null;
+        $logradouro = $logradouro ?: null;
+        $bairro = $bairro ?: null;
+        $cidade = $cidade ?: null;
+        $uf = $uf ?: null;
 
-            $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        $stmt = $conexao->prepare(
+            "INSERT INTO Usuario (nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("sssisssss", $nome, $email, $senhaHash, $id_perfil, $cep, $logradouro, $bairro, $cidade, $uf);
+        $cadastrou = $stmt->execute();
+        $stmt->close();
 
-            $stmt = $conexao->prepare(
-                "INSERT INTO Usuario (nome, email, senha, id_perfil)
-                VALUES (?, ?, ?, ?)"
-            );
-
-            $stmt->bind_param(
-                "sssi",
-                $nome,
-                $email,
-                $senhaHash,
-                $id_perfil
-            );
-
-            if ($stmt->execute()) {
-                if ($adminCadastrando) {
-                    $_SESSION['mensagem'] = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                                                Usuário '<strong>" . htmlspecialchars($nome) . "</strong>' cadastrado com sucesso!
-                                                <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
-                                            </div>";
-                    header("Location: usuario_lista.php");
-                } else {
-                    header("Location: login.php?cadastro=ok");
-                }
-                exit();
+        if ($cadastrou) {
+            if ($adminCadastrando) {
+                $_SESSION['mensagem'] = mensagem('success', "Usuário '$nome' cadastrado com sucesso!");
+                header("Location: usuario_lista.php");
             } else {
-                echo "<script>alert('Erro ao cadastrar usuário.');</script>";
+                header("Location: login.php?cadastro=ok");
             }
+            exit();
         }
 
-        $stmt->close();
+        $erro = 'Erro ao cadastrar usuário. Tente novamente.';
     }
 }
 ?>
@@ -95,6 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
         crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../Assets/css/cadastro.css">
 </head>
@@ -125,6 +148,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <form id="formCadastro" method="POST">
 
+                        <?php if ($erro !== ''): ?>
+                            <!-- Mostra o erro aqui dentro do card, no lugar do alert() -->
+                            <div style="margin: 0 20px;"><?= mensagem('danger', $erro) ?></div>
+                        <?php endif; ?>
+
                         <label class="label_login" for="nomeCadastro">
                             Nome completo
                         </label>
@@ -135,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="nomeCadastro"
                             name="nome"
                             placeholder="Digite seu nome completo"
+                            value="<?= htmlspecialchars($nome) ?>"
                             required>
 
                         <label class="label_login" for="emailCadastro">
@@ -147,7 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="emailCadastro"
                             placeholder="Digite seu email"
                             required
-                            name="email">
+                            name="email"
+                            value="<?= htmlspecialchars($email) ?>">
 
                         <br>
 
@@ -159,6 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             class="form_text"
                             type="password"
                             id="senhaCadastro"
+                            minlength="8"
                             placeholder="Digite sua senha"
                             required
                             name="senha">
@@ -173,6 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             class="form_text"
                             type="password"
                             id="confirmaSenha"
+                            minlength="8"
                             placeholder="Confirme sua senha"
                             required
                             name="confirmaSenha">

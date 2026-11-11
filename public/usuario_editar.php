@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        $erro = 'Erro ao atualizar no banco: ' . $stmt->error;
+        $erro = 'Não foi possível atualizar o usuário. Tente novamente.';
         $stmt->close();
     }
 
@@ -111,9 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Editar Usuário</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/css/trem.css">
-    <link rel="stylesheet" href="../Assets/css/home.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 
@@ -122,6 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="app-container">
 
         <?php require '../infra/sidebar.php'; ?>
+    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
         <main class="content">
 
@@ -175,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="col-md-12">
                                     <div class="card-input">
                                         <label for="id_perfil">Perfil</label>
-                                        <select id="id_perfil" name="id_perfil" class="form-select border-0 text-center" style="background-color: rgb(248, 161, 61); font-weight: bold; border-radius: 25px; width: 90%;" required>
+                                        <select id="id_perfil" name="id_perfil" class="form-select border-0 text-center" style="background-color: #df9b49; font-weight: bold; border-radius: 25px; width: 90%;" required>
                                             <?php foreach ($perfis as $perfil): ?>
                                                 <option value="<?= (int)$perfil['id_perfil'] ?>" <?= (int)$usuario['id_perfil'] === (int)$perfil['id_perfil'] ? 'selected' : '' ?>>
                                                     <?= htmlspecialchars($perfil['nome_perfil']) ?>

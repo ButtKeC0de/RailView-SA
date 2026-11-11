@@ -3,7 +3,8 @@ require_once '../infra/auth.php';
 exigir_login();
 
 $stmt = $conexao->prepare(
-    "SELECT u.id_usuario, u.nome, u.email, p.nome_perfil
+    "SELECT u.id_usuario, u.nome, u.email, p.nome_perfil,
+            u.logradouro, u.bairro, u.cidade, u.uf, u.cep
      FROM Usuario u
      JOIN Perfil p ON p.id_perfil = u.id_perfil
      WHERE u.id_usuario = ?"
@@ -12,6 +13,17 @@ $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
 $stmt->close();
+
+// Monta o endereço em uma linha só, ignorando as partes vazias.
+// array_filter tira os itens vazios; implode junta com ", ".
+$partesEndereco = array_filter([
+    $usuario['logradouro'],
+    $usuario['bairro'],
+    $usuario['cidade'],
+    $usuario['uf'],
+    $usuario['cep'],
+]);
+$endereco = $partesEndereco ? implode(', ', $partesEndereco) : 'Não informado';
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -22,11 +34,10 @@ $stmt->close();
     <title>Meu Perfil</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="../Assets/css/trem.css">
-    <link rel="stylesheet" href="../Assets/css/home.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
 
@@ -35,6 +46,7 @@ $stmt->close();
     <div class="app-container">
 
         <?php require '../infra/sidebar.php'; ?>
+    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
         <main class="content">
 
@@ -80,6 +92,13 @@ $stmt->close();
                         <div class="card-input">
                             <label for="perfil">Perfil</label>
                             <input type="text" id="perfil" value="<?= htmlspecialchars($usuario['nome_perfil']) ?>" readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-input">
+                            <label for="endereco">Endereço</label>
+                            <input type="text" id="endereco" value="<?= htmlspecialchars($endereco) ?>" readonly>
                         </div>
                     </div>
 

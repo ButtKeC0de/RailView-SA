@@ -65,6 +65,8 @@ $cadastroOk = isset($_GET['cadastro']);
         crossorigin="anonymous"
     >
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../Assets/css/login.css">
 </head>
 
@@ -80,6 +82,16 @@ $cadastroOk = isset($_GET['cadastro']);
                 <img src="../Assets/logos/logo_sem_fundo.png" alt="Logo" class="logo_login">
 
                 <form id="formLogin" action="login.php" method="POST">
+
+                    <!-- Avisos aparecem aqui dentro do card, no lugar do alert() -->
+                    <div style="margin: 0 20px;">
+                        <?php if ($erro !== ''): ?>
+                            <?= mensagem('danger', $erro) ?>
+                        <?php elseif ($cadastroOk): ?>
+                            <?= mensagem('success', 'Cadastro realizado! Agora é só entrar.') ?>
+                        <?php endif; ?>
+                    </div>
+
                     <label class="label_login" for="email">
                         Email ou usuário
                     </label>
@@ -127,12 +139,6 @@ $cadastroOk = isset($_GET['cadastro']);
         integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
         crossorigin="anonymous">
     </script>
-
-    <?php if ($erro !== ''): ?>
-        <script>alert(<?= json_encode($erro, JSON_UNESCAPED_UNICODE) ?>);</script>
-    <?php elseif ($cadastroOk): ?>
-        <script>alert('Cadastro realizado! Agora é só entrar.');</script>
-    <?php endif; ?>
 
 </body>
 
