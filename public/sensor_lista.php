@@ -9,20 +9,33 @@ if (isset($_SESSION['mensagem'])) {
     unset($_SESSION['mensagem']);
 }
 
-$sql = "SELECT 
-            s.id_sensor,
-            s.tipo_sensor,
-            s.localizacao,
-            s.status_sensor,
-            s.empresa_operadora,
-            s.id_trem,
-            t.apelido AS nome_trem,
-            t.modelo AS modelo_trem
-        FROM Sensor s
-        LEFT JOIN Trem t ON s.id_trem = t.id_trem
-        ORDER BY s.id_sensor DESC";
+// Se vier ?id=5 na URL (clique num sensor da tela anterior), mostra só esse sensor.
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-$resultado = $conexao->query($sql);
+$select = "SELECT
+               s.id_sensor,
+               s.tipo_sensor,
+               s.localizacao,
+               s.status_sensor,
+               s.empresa_operadora,
+               s.id_trem,
+               t.apelido AS nome_trem,
+               t.modelo AS modelo_trem
+           FROM Sensor s
+           LEFT JOIN Trem t ON s.id_trem = t.id_trem";
+
+if ($id) {
+    // Busca um sensor só (consulta preparada, porque usa dado da URL).
+    $stmt = $conexao->prepare($select . " WHERE s.id_sensor = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $stmt->close();
+} else {
+    // Busca todos os sensores.
+    $resultado = $conexao->query($select . " ORDER BY s.id_sensor DESC");
+}
+
 $sensores = [];
 
 if ($resultado) {
@@ -40,9 +53,9 @@ if ($resultado) {
     <title>Lista de Sensores - Rail View</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../Assets/css/home.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/css/sensor.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
 </head>
@@ -52,6 +65,7 @@ if ($resultado) {
     <div class="app-container d-flex">
 
         <?php require '../infra/sidebar.php'; ?>
+    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
         <main class="content flex-grow-1 p-4">
 
@@ -67,6 +81,11 @@ if ($resultado) {
                 </div>
 
                 <?php if (!empty($mensagem)) echo $mensagem; ?>
+
+                <?php if ($id): ?>
+                    <!-- Está mostrando só um sensor: oferece voltar para a lista completa -->
+                    <p class="mb-3"><a href="sensor_lista.php" class="btn btn-dark btn-sm rounded-pill px-3">&larr; Ver todos os sensores</a></p>
+                <?php endif; ?>
 
                 <div class="mb-4">
                     <input type="text" id="campoBusca" class="form-control input-busca" placeholder="🔍 Pesquisar por tipo, localização, operadora ou trem...">
@@ -94,17 +113,22 @@ if ($resultado) {
                                                 </span>
 
                                                 <?php if (eh_admin()): ?>
-                                                <a href="sensor_editar.php?id=<?= $sensor['id_sensor'] ?>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Editar">
+                                                <a href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Editar">
                                                     Editar
                                                 </a>
 
-                                                <a href="sensor_excluir.php?id=<?= $sensor['id_sensor'] ?>" class="btn btn-sm btn-danger text-white fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este sensor?');">
-                                                    Excluir
-                                                </a>
+                                                <!-- Excluir usa formulário POST: só apaga ao clicar no botão -->
+                                                <form action="sensor_excluir.php" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Tem certeza que deseja excluir este sensor?');">
+                                                    <input type="hidden" name="id" value="<?= (int)$sensor['id_sensor'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger text-white fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Excluir">
+                                                        Excluir
+                                                    </button>
+                                                </form>
                                                 <?php endif; ?>
                                             </div>
 
-                                            <small class="text-muted">#<?= $sensor['id_sensor'] ?></small>
+                                            <small class="text-muted">#<?= (int)$sensor['id_sensor'] ?></small>
                                         </div>
 
                                         <div class="mb-2">
@@ -134,11 +158,13 @@ if ($resultado) {
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
-                        <div class="alert alert-info text-center rounded-4 py-4" role="alert">
-                            Nenhum sensor cadastrado até o momento.
+                        <!-- Estado vazio: ícone, explicação e atalho para cadastrar -->
+                        <div class="estado-vazio bg-white rounded-4">
+                            <div class="estado-vazio-icone"><i class="bi bi-broadcast"></i></div>
+                            <h3><?= $id ? 'Sensor não encontrado' : 'Nenhum sensor cadastrado' ?></h3>
+                            <p>Os sensores cadastrados vão aparecer aqui.</p>
                             <?php if (eh_admin()): ?>
-                            <br>
-                            <a href="sensor_cadastro.php" class="alert-link">Clique aqui para cadastrar o primeiro sensor.</a>
+                                <a href="sensor_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro sensor</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
