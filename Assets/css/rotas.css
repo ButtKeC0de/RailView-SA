@@ -1,6 +1,6 @@
 :root {
-    --laranja: #f2a03a;
-    --laranja-escuro: #df8925;
+    --laranja: #df9b49;
+    --laranja-escuro: #c4823a;
     --grafite: #31384a;
     --grafite-claro: #424a60;
     --fundo: #e6e9ed;
@@ -39,7 +39,6 @@ a {
     min-height: 100vh;
 }
 
-
 .conteudo {
     min-height: 100vh;
     padding: 34px clamp(24px, 4vw, 64px) 50px;
@@ -57,48 +56,11 @@ a {
     gap: 24px;
 }
 
-.subtitulo {
-    margin-bottom: 3px;
-    color: var(--texto-suave);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
 .titulo_home {
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 600;
     line-height: 1.1;
 }
-
-.usuario {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 8px 14px 8px 8px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.72);
-    color: inherit;
-    text-decoration: none;
-}
-
-.foto_usuario {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    color: var(--branco);
-    background: var(--grafite);
-    border-radius: 50%;
-    font-size: 1.45rem;
-}
-
-.nome_usuario {
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
 
 #rotas_cadastradas {
     width: 100%;
@@ -195,7 +157,7 @@ a {
 .campo select:focus,
 .pesquisa:focus-within {
     border-color: var(--laranja);
-    box-shadow: 0 0 0 3px rgba(242, 160, 58, 0.18);
+    box-shadow: 0 0 0 3px rgba(223, 155, 73, 0.18);
 }
 
 .mensagem {
@@ -241,7 +203,6 @@ a {
     text-align: center;
     text-decoration: none;
 }
-
 
 #trens_2 {
     min-height: 435px;
@@ -349,7 +310,7 @@ a {
     place-items: center;
     border-radius: 11px;
     color: var(--laranja);
-    background: rgba(242, 160, 58, 0.15);
+    background: rgba(223, 155, 73, 0.15);
     text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease;
 }
@@ -380,7 +341,6 @@ a {
     color: var(--branco);
     background: var(--perigo);
 }
-
 
 .estado-vazio {
     min-height: 270px;
@@ -457,7 +417,6 @@ a {
     border: 0;
 }
 
-
 @media (max-width: 1050px) {
     #rotas_cadastradas {
         grid-template-columns: 1fr;
@@ -477,15 +436,6 @@ a {
 
     .topo {
         align-items: flex-start;
-    }
-
-    .usuario {
-        padding: 6px;
-    }
-
-    .nome_usuario,
-    .subtitulo {
-        display: none;
     }
 
     .lista-topo {

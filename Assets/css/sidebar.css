@@ -1,6 +1,6 @@
 :root {
     --sidebar-largura: 100px;
-    --sidebar-cor: #f2a03a;
+    --sidebar-cor: #df9b49;
 }
 
 .sidebar {
@@ -120,4 +120,127 @@
         margin-left: 0;
         padding-bottom: 105px;
     }
+}
+
+/* Selo do usuário logado (infra/usuario_topo.php) */
+.usuario-topo {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 14px 8px 8px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.72);
+    color: #242832;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+.usuario-topo:hover {
+    background: #ffffff;
+    color: #242832;
+}
+
+.usuario-topo-foto {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    background: #31384a;
+    border-radius: 50%;
+}
+
+.usuario-topo-foto svg {
+    width: 22px;
+    height: 22px;
+}
+
+.usuario-topo-nome {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.usuario-topo--fixo {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    z-index: 900;
+    box-shadow: 0 6px 18px rgba(32, 38, 52, 0.12);
+}
+
+@media (max-width: 700px) {
+    .usuario-topo {
+        padding: 6px;
+    }
+
+    .usuario-topo-nome {
+        display: none;
+    }
+
+    .usuario-topo--fixo {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+.usuario-topo--fixo ~ .content,
+.usuario-topo--fixo ~ .conteudo {
+    padding-top: 90px !important;
+}
+
+/* Fundo padrão de todas as páginas do sistema (vetorial, nítido em qualquer tela) */
+body:has(.sidebar) {
+    background: #e6e9ed url(../Images/fundo_sistema.svg) center / cover no-repeat fixed !important;
+}
+
+.sidebar ~ .content,
+.sidebar ~ .conteudo {
+    background: transparent !important;
+}
+
+/* Estado vazio (quando ainda não há nada cadastrado) — usado em várias páginas */
+.estado-vazio {
+    padding: 40px 20px;
+    text-align: center;
+    color: #4b5563;
+}
+
+.estado-vazio-icone {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 14px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background-color: #f3e3cf;
+    color: #c4823a;
+    font-size: 2rem;
+}
+
+.estado-vazio h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #242832;
+}
+
+.estado-vazio p {
+    margin-bottom: 16px;
+}
+
+/* Variação para fundo escuro */
+.estado-vazio--escuro,
+.estado-vazio--escuro h3 {
+    color: #ffffff;
+}
+
+.estado-vazio--escuro p {
+    color: #bdc3d1;
+}
+
+.estado-vazio--escuro .estado-vazio-icone {
+    background-color: rgba(223, 155, 73, 0.18);
+    color: #df9b49;
 }

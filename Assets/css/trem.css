@@ -9,7 +9,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     background: #dfe3e8;
     overflow: hidden;
 }
@@ -31,7 +31,7 @@ body {
 }
 
 .painel-cadastro {
-    background: #F2A03A;
+    background: #df9b49;
     border-radius: 35px;
     padding: 40px;
     margin: auto;
@@ -67,7 +67,7 @@ body {
     height: 50px;
     border: none;
     border-radius: 50px;
-    background: #F2A03A;
+    background: #df9b49;
     text-align: center;
     outline: none;
 }
@@ -93,3 +93,27 @@ body {
 .btn-enviar:hover {
     transform: scale(1.03);
 }
+/* Etiqueta colorida do tipo de trem (lista de trens) */
+.badge-tipo {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.tipo-carga {
+    background-color: #8a5a2b;
+}
+
+.tipo-passageiros {
+    background-color: #2563eb;
+}
+
+.tipo-misto {
+    background-color: #7c3aed;
+}
+
+.tipo-outro {
+    background-color: #4b5563;
+}
+

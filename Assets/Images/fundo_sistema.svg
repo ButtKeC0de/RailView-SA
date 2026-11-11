@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6dae1"/>
+      <stop offset="0.45" stop-color="#f2f3f5"/>
+      <stop offset="1" stop-color="#d3d7de"/>
+    </linearGradient>
+
+    <pattern id="pontos" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="4.2" fill="#ffffff"/>
+    </pattern>
+
+    <linearGradient id="opacidade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.85"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <linearGradient id="sumir" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.25"/>
+    </linearGradient>
+
+    <mask id="onda">
+      <path d="M0,640 C360,800 760,860 1060,580 C1320,330 1600,150 1920,110 L1920,1080 L0,1080 Z" fill="url(#opacidade)"/>    </mask>
+
+    <filter id="brilho" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#fundo)"/>
+  <rect width="1920" height="1080" fill="url(#pontos)" mask="url(#onda)"/>
+  <path d="M0,640 C360,800 760,860 1060,580 C1320,330 1600,150 1920,110" fill="none" stroke="#ffffff" stroke-width="26" stroke-opacity="0.55" filter="url(#brilho)"/>
+</svg>

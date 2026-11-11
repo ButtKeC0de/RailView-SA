@@ -23,13 +23,13 @@ html, body {
 .container_termos {
     width: 600px;
     height: 850px;
-    background-color: rgba(255, 153, 0, 0.9);
+    background-color: rgba(223, 155, 73, 0.9);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 20px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     box-sizing: border-box;
     padding: 20px;
     display: flex;
@@ -66,13 +66,13 @@ html, body {
     padding: 20px;
     overflow-y: auto;
     color: #000;
-    font-family: Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     line-height: 1.5;
     margin-bottom: 20px;
 }
 
 .conteudo-termos h5 {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     font-size: 20px;
     margin-top: 15px;
     margin-bottom: 5px;
@@ -99,7 +99,7 @@ html, body {
 }
 
 .conteudo-termos::-webkit-scrollbar-thumb {
-    background: #ff9900;
+    background: #df9b49;
     border-radius: 10px;
 }
 
@@ -116,7 +116,7 @@ html, body {
     border: none;
     outline: none;
     font-size: 28px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
     font-weight: bold;
     cursor: pointer;
     background-color: #ffffff;
