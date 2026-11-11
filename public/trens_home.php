@@ -99,7 +99,6 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
                 <h2> Gerenciar trens </h2>
 
-                <!-- Na lista dá para editar e excluir -->
                 <form action="trens_lista.php" method="get">
                     <button type="submit" class="botao_laranja"> Gerenciar </button>
                 </form>
