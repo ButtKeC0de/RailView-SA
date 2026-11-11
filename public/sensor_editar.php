@@ -4,7 +4,6 @@ exigir_admin();
 
 $mensagem = "";
 
-// Lista de trens para o <select> do formulário.
 $trens = [];
 $resultTrens = $conexao->query("SELECT id_trem, apelido, modelo FROM Trem ORDER BY apelido ASC");
 if ($resultTrens) {
@@ -13,7 +12,6 @@ if ($resultTrens) {
     }
 }
 
-// 1) Pega o ID do sensor pela URL (só aceita número inteiro).
 $id_sensor = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 if (!$id_sensor) {
@@ -21,7 +19,6 @@ if (!$id_sensor) {
     exit();
 }
 
-// 2) Busca o sensor no banco.
 $stmt = $conexao->prepare("SELECT * FROM Sensor WHERE id_sensor = ?");
 $stmt->bind_param("i", $id_sensor);
 $stmt->execute();
@@ -34,7 +31,6 @@ if (!$sensor) {
     exit();
 }
 
-// 3) Formulário enviado: valida e salva.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tipo_sensor       = trim($_POST['tipo_sensor'] ?? '');
     $localizacao       = trim($_POST['localizacao'] ?? '');
@@ -51,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensagem = mensagem('danger', 'Status do sensor inválido.');
 
     } else {
-        // Confere se o trem escolhido existe mesmo no banco.
         $stmt = $conexao->prepare("SELECT id_trem FROM Trem WHERE id_trem = ?");
         $stmt->bind_param("i", $id_trem);
         $stmt->execute();
@@ -74,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
 
-            // Mensagem genérica: não mostramos o erro do banco para o usuário.
             $mensagem = mensagem('danger', 'Não foi possível atualizar o sensor. Tente novamente.');
             $stmt->close();
         }
