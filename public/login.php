@@ -82,7 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form id="formLogin" action="login.php" method="POST">
 
-                    <!-- Avisos aparecem aqui dentro do card, no lugar do alert() -->
                     <div style="margin: 0 20px;">
                         <?php if ($erro !== ''): ?>
                             <?= mensagem('danger', $erro) ?>
