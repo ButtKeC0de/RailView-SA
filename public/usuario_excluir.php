@@ -41,14 +41,28 @@ if ((int)$usuario['id_perfil'] === PERFIL_ADMIN) {
     }
 }
 
-$stmt = $conexao->prepare("DELETE FROM Usuario WHERE id_usuario = ?");
-$stmt->bind_param("i", $id);
-$excluiu = $stmt->execute();
-$erro = $stmt->error;
-$stmt->close();
+// Os trens deste usuário NÃO são apagados: eles só ficam sem responsável.
+// A transação garante que as duas etapas acontecem juntas (ou nenhuma acontece).
+$conexao->begin_transaction();
 
-if (!$excluiu) {
-    $_SESSION['mensagem'] = "<div class='alert alert-danger'>Erro ao excluir o usuário: " . htmlspecialchars($erro) . "</div>";
+try {
+    // 1) Tira o usuário como responsável dos trens dele.
+    $stmt = $conexao->prepare("UPDATE Trem SET id_usuario = NULL WHERE id_usuario = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    // 2) Agora o usuário pode ser excluído sem quebrar nenhum vínculo.
+    $stmt = $conexao->prepare("DELETE FROM Usuario WHERE id_usuario = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    $conexao->commit();
+} catch (mysqli_sql_exception $e) {
+    // Deu erro em alguma etapa: desfaz tudo e avisa, sem mostrar detalhes do banco.
+    $conexao->rollback();
+    $_SESSION['mensagem'] = "<div class='alert alert-danger'>Não foi possível excluir o usuário. Tente novamente.</div>";
     header("Location: $voltarPara");
     exit();
 }
