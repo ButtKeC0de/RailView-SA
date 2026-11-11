@@ -148,7 +148,6 @@ body {
   border: none;
 }
 
-/* Status colorido dos sensores (tela Sensores) */
 .status-sensor {
     display: inline-block;
     margin-top: 6px;
