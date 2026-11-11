@@ -189,3 +189,10 @@ body {
         font-size: 30px;
     }
 }
+
+/* Painel meteorológico simplificado. */
+.clima-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.clima-card h2 { margin: 0 0 6px; }
+.clima-info { margin: 0; flex-shrink: 0; }
+#clima-temperatura.clima-status { font-size: .9rem; color: #596475; font-weight: 500; }
+@media (max-width: 700px) { .clima-card { flex-wrap: wrap; gap: 16px; } }

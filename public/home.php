@@ -58,20 +58,16 @@ exigir_login();
 
             </section>
 
-            <section class="clima-card">
+            <section class="clima-card" aria-labelledby="titulo-clima">
                 <div>
-                    <p class="clima-label">MONITORAMENTO CLIMÁTICO</p>
-                    <h2>Condições meteorológicas</h2>
+                    <h2 id="titulo-clima">Condições meteorológicas</h2>
                     <p id="clima-local">Joinville, SC</p>
                 </div>
 
-                <div class="clima-info">
-                    <span id="clima-icone">🌤️</span>
-                    <strong id="clima-temperatura">-- °C</strong>
-                    <span id="clima-condicao">Consultando clima...</span>
+                <div class="clima-info" role="status" aria-live="polite" aria-busy="true">
+                    <strong id="clima-temperatura" class="clima-status">Consultando…</strong>
                 </div>
 
-                <p id="clima-atualizacao">Aguardando dados da API...</p>
             </section>
 
         </main>
