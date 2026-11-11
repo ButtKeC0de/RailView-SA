@@ -2,15 +2,6 @@
 require_once '../infra/auth.php';
 exigir_login();
 
-function contar_registros(mysqli $conexao, string $tabela): int
-{
-    $resultado = $conexao->query("SELECT COUNT(*) AS total FROM $tabela");
-    return $resultado ? (int)$resultado->fetch_assoc()['total'] : 0;
-}
-
-$totalRotas = contar_registros($conexao, 'Rota');
-$totalTrens = contar_registros($conexao, 'Trem');
-$totalSensores = contar_registros($conexao, 'Sensor');
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -33,7 +24,6 @@ $totalSensores = contar_registros($conexao, 'Sensor');
 
             <header class="topo">
                 <div>
-                    <p class="subtitulo">Painel Rail View</p>
                     <h1 class="titulo_home">Início</h1>
                 </div>
 
@@ -46,7 +36,6 @@ $totalSensores = contar_registros($conexao, 'Sensor');
                     <img src="../Assets/logos/icon_rotas.png" alt="">
                     <div>
                         <h2>Rotas</h2>
-                        <p><?= $totalRotas ?> cadastrada<?= $totalRotas === 1 ? '' : 's' ?></p>
                     </div>
                     <span class="atalho-seta" aria-hidden="true">&rarr;</span>
                 </a>
@@ -55,7 +44,6 @@ $totalSensores = contar_registros($conexao, 'Sensor');
                     <img src="../Assets/logos/icon_trem.png" alt="">
                     <div>
                         <h2>Trens</h2>
-                        <p><?= $totalTrens ?> cadastrado<?= $totalTrens === 1 ? '' : 's' ?></p>
                     </div>
                     <span class="atalho-seta" aria-hidden="true">&rarr;</span>
                 </a>
@@ -64,7 +52,6 @@ $totalSensores = contar_registros($conexao, 'Sensor');
                     <img src="../Assets/logos/icon_sensores.png" alt="">
                     <div>
                         <h2>Sensores</h2>
-                        <p><?= $totalSensores ?> cadastrado<?= $totalSensores === 1 ? '' : 's' ?></p>
                     </div>
                     <span class="atalho-seta" aria-hidden="true">&rarr;</span>
                 </a>
