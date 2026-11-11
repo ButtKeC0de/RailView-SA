@@ -70,6 +70,11 @@
     margin-bottom: 15px;
 }
 
+/* Recorta apenas o fundo externo do ícone fornecido. */
+.sidebar-nav img.icone-usuarios {
+    clip-path: circle(41% at 50% 50%);
+}
+
 .sidebar ~ .content,
 .sidebar ~ .conteudo {
     margin-left: var(--sidebar-largura);

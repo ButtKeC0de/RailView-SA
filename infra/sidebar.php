@@ -4,6 +4,7 @@ $ativoHome = $paginaAtual === 'home.php' ? 'ativo' : '';
 $ativoRotas = strpos($paginaAtual, 'criacao_rotas') === 0 ? 'ativo' : '';
 $ativoTrens = strpos($paginaAtual, 'trens_') === 0 ? 'ativo' : '';
 $ativoSensores = strpos($paginaAtual, 'sensor_') === 0 ? 'ativo' : '';
+$ativoUsuarios = strpos($paginaAtual, 'usuario_') === 0 ? 'ativo' : '';
 ?>
 <aside class="sidebar">
     <a class="sidebar-logo" href="home.php" title="Início">
@@ -23,6 +24,11 @@ $ativoSensores = strpos($paginaAtual, 'sensor_') === 0 ? 'ativo' : '';
         <a href="Sensor_lista.php" title="Sensores" class="<?= $ativoSensores ?>">
             <img src="../Assets/logos/icon_sensores.png" alt="Sensores">
         </a>
+        <?php if (eh_admin()): ?>
+        <a href="usuario_lista.php" title="Gerenciar usuários" class="<?= $ativoUsuarios ?>">
+            <img class="icone-usuarios" src="../Assets/logos/icon_usuarios_contorno.png" alt="Gerenciar usuários">
+        </a>
+        <?php endif; ?>
     </nav>
 
 
