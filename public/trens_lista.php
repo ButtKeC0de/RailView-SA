@@ -88,7 +88,6 @@ if (isset($stmt)) {
             ?>
 
             <?php if ($id): ?>
-                <!-- Está mostrando só um trem: oferece voltar para a lista completa -->
                 <p class="mb-3"><a href="trens_lista.php" class="btn btn-dark btn-sm rounded-pill px-3">&larr; Ver todos os trens</a></p>
             <?php endif; ?>
 
@@ -140,8 +139,6 @@ if (isset($stmt)) {
                                     </td>
 
                                     <?php
-                                    // Escolhe a cor da etiqueta pelo tipo do trem.
-                                    // mb_strtolower deixa tudo minúsculo; str_contains procura a palavra.
                                     $tipoMinusculo = mb_strtolower($trem['tipo_trem']);
 
                                     if (str_contains($tipoMinusculo, 'carga')) {
@@ -187,7 +184,6 @@ if (isset($stmt)) {
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
 
-                                            <!-- Excluir usa formulário POST: só apaga ao clicar no botão -->
                                             <form action="trens_excluir.php" method="POST" class="d-inline"
                                                   onsubmit="return confirm('Tem certeza que deseja excluir este trem?');">
                                                 <input type="hidden" name="id" value="<?= (int)$trem['id_trem'] ?>">
