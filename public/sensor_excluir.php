@@ -2,14 +2,11 @@
 require_once '../infra/auth.php';
 exigir_admin();
 
-// Exclusão só acontece por formulário (POST).
-// Se alguém só abrir o link no navegador (GET), nada é apagado.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: sensor_lista.php");
     exit();
 }
 
-// Pega o ID enviado pelo formulário
 $id_sensor = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
 if (!$id_sensor) {
@@ -21,7 +18,6 @@ if (!$id_sensor) {
     exit();
 }
 
-// Excluir um sensor apaga só o sensor (e os alertas dele). O trem continua.
 $stmt = $conexao->prepare("DELETE FROM Sensor WHERE id_sensor = ?");
 $stmt->bind_param("i", $id_sensor);
 $stmt->execute();
