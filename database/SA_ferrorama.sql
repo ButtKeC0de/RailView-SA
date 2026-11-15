@@ -215,9 +215,9 @@ ALTER TABLE Historico_Rota
 -- O hash bcrypt é validado pelo script scripts/verificar_demo.php.
 START TRANSACTION;
 INSERT INTO Usuario (nome, email, senha, id_perfil) VALUES
-('Admin Demo', 'admin@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 1),
-('Funcionario Demo', 'funcionario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 2),
-('Usuario Demo', 'usuario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 3)
+('Admin Demo', 'admin@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
+('Funcionario Demo', 'funcionario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
+('Usuario Demo', 'usuario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3)
 ON DUPLICATE KEY UPDATE email = VALUES(email);
 
 -- Localiza as contas por email, sem presumir IDs de uma instalação anterior.

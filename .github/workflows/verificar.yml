@@ -42,3 +42,22 @@ jobs:
           test "$(mysql -h 127.0.0.1 -u root -N -e 'SELECT COUNT(*) FROM rail_view_db.Rota')" = 2
           test "$(mysql -h 127.0.0.1 -u root -N -e 'SELECT COUNT(*) FROM rail_view_db.Historico_Rota')" = 2
           test "$(mysql -h 127.0.0.1 -u root -N -e 'SELECT COUNT(*) FROM rail_view_db.Limite_Sensor')" = 2
+
+  publicar-versao:
+    needs: verificar
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publicar v1.0.0 após verificações
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo 'v1.0.0 já existe; preservando a versão publicada.'
+          else
+            gh release create v1.0.0 --target "$GITHUB_SHA" --title 'Rail View v1.0.0' --notes-file docs/release-v1.0.0.md
+          fi
