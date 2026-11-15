@@ -1,0 +1,10 @@
+.vscode/
+.idea/
+*.log
+Thumbs.db
+.DS_Store
+.env
+.env.*
+!.env.example
+infra/config.local.php
+docs/evidencias/privado/

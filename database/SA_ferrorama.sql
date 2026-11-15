@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS rail_view_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -39,18 +41,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
 );
 
 
-INSERT IGNORE INTO Usuario (
-    nome,
-    email,
-    senha,
-    id_perfil
-)
-VALUES (
-    'caio123',
-    'caio123@railview.com',
-    '$2y$10$1Ne6Q8VbsDZcU/0qcupHY.eDoISn6Bbrk3hA0tl9HcT2vf4RMceni',
-    1
-);
+
 
 CREATE TABLE IF NOT EXISTS Trem (
     id_trem INT AUTO_INCREMENT PRIMARY KEY,
@@ -132,6 +123,25 @@ CREATE TABLE IF NOT EXISTS Alerta (
         ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Limite_Sensor (
+    id_sensor INT PRIMARY KEY,
+    maximo DOUBLE NULL,
+    unidade VARCHAR(20) NOT NULL DEFAULT '',
+    CONSTRAINT limite_sensor_fk FOREIGN KEY (id_sensor)
+        REFERENCES Sensor(id_sensor) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Leitura_Sensor (
+    id_leitura INT AUTO_INCREMENT PRIMARY KEY,
+    id_sensor INT NOT NULL,
+    valor DOUBLE NULL,
+    falha TINYINT(1) NOT NULL DEFAULT 0,
+    unidade VARCHAR(20) NOT NULL DEFAULT '',
+    data_leitura DATETIME NOT NULL,
+    CONSTRAINT leitura_sensor_fk FOREIGN KEY (id_sensor)
+        REFERENCES Sensor(id_sensor) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS Manutencao (
     id_manutencao INT AUTO_INCREMENT PRIMARY KEY,
     data_inicio DATE NOT NULL,
@@ -155,6 +165,8 @@ ALTER TABLE Sensor         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 ALTER TABLE Rota           CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Historico_Rota CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Alerta         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE Limite_Sensor  CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE Leitura_Sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Manutencao     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
@@ -199,65 +211,52 @@ ALTER TABLE Historico_Rota
         ON DELETE RESTRICT
         ON UPDATE CASCADE;
 
+-- Contas exclusivamente fictícias. Senha pública de demonstração: password
+-- O hash bcrypt é validado pelo script scripts/verificar_demo.php.
+START TRANSACTION;
+INSERT INTO Usuario (nome, email, senha, id_perfil) VALUES
+('Admin Demo', 'admin@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 1),
+('Funcionario Demo', 'funcionario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 2),
+('Usuario Demo', 'usuario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi', 3)
+ON DUPLICATE KEY UPDATE email = VALUES(email);
 
+-- Localiza as contas por email, sem presumir IDs de uma instalação anterior.
+SET @admin_demo = (SELECT id_usuario FROM Usuario WHERE email = 'admin@demo.test');
+INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario)
+SELECT 'Expresso Demo Norte', 'Passageiros', 'Ferrovia Demo', 'Modelo Demo A', 8, @admin_demo
+WHERE NOT EXISTS (SELECT 1 FROM Trem WHERE apelido = 'Expresso Demo Norte');
+INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario)
+SELECT 'Carga Demo Sul', 'Carga', 'Ferrovia Demo', 'Modelo Demo B', 20, @admin_demo
+WHERE NOT EXISTS (SELECT 1 FROM Trem WHERE apelido = 'Carga Demo Sul');
+SET @trem_demo = (SELECT MIN(id_trem) FROM Trem WHERE apelido = 'Expresso Demo Norte');
+SET @carga_demo = (SELECT MIN(id_trem) FROM Trem WHERE apelido = 'Carga Demo Sul');
 
-USE rail_view_db;
+INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem)
+SELECT 'Temperatura', 'Motor Demo A', 'Ativo', 'Ferrovia Demo', @trem_demo
+WHERE NOT EXISTS (SELECT 1 FROM Sensor WHERE id_trem = @trem_demo AND localizacao = 'Motor Demo A');
+INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem)
+SELECT 'Velocidade', 'Cabine Demo B', 'Manutenção', 'Ferrovia Demo', @carga_demo
+WHERE NOT EXISTS (SELECT 1 FROM Sensor WHERE id_trem = @carga_demo AND localizacao = 'Cabine Demo B');
 
+INSERT INTO Rota (nome_rota, origem, destino, operadora)
+SELECT 'Rota Demo Norte', 'Joinville', 'Curitiba', 'Ferrovia Demo'
+WHERE NOT EXISTS (SELECT 1 FROM Rota WHERE nome_rota = 'Rota Demo Norte');
+INSERT INTO Rota (nome_rota, origem, destino, operadora)
+SELECT 'Rota Demo Sul', 'Joinville', 'Florianópolis', 'Ferrovia Demo'
+WHERE NOT EXISTS (SELECT 1 FROM Rota WHERE nome_rota = 'Rota Demo Sul');
+SET @rota_demo = (SELECT MIN(id_rota) FROM Rota WHERE nome_rota = 'Rota Demo Norte');
+SET @rota_carga = (SELECT MIN(id_rota) FROM Rota WHERE nome_rota = 'Rota Demo Sul');
+INSERT INTO Historico_Rota (data_inicio, id_trem, id_rota)
+SELECT '2026-11-15 08:00:00', @trem_demo, @rota_demo
+WHERE NOT EXISTS (SELECT 1 FROM Historico_Rota WHERE id_trem = @trem_demo AND id_rota = @rota_demo);
+INSERT INTO Historico_Rota (data_inicio, id_trem, id_rota)
+SELECT '2026-11-15 09:00:00', @carga_demo, @rota_carga
+WHERE NOT EXISTS (SELECT 1 FROM Historico_Rota WHERE id_trem = @carga_demo AND id_rota = @rota_carga);
+INSERT INTO Limite_Sensor (id_sensor, maximo, unidade)
+SELECT s.id_sensor, 80, CASE WHEN s.tipo_sensor = 'Temperatura' THEN '°C' ELSE 'km/h' END
+FROM Sensor s
+WHERE (s.id_trem = @trem_demo AND s.localizacao = 'Motor Demo A')
+   OR (s.id_trem = @carga_demo AND s.localizacao = 'Cabine Demo B')
+ON DUPLICATE KEY UPDATE id_sensor = VALUES(id_sensor);
+COMMIT;
 
-INSERT INTO Usuario (nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf) VALUES
-('Joao Silva', 'joao@railview.com', '123456', 2, '89201000', 'Rua das Flores', 'Centro', 'Joinville', 'SC'),
-('Maria Oliveira', 'maria@email.com', '123456', 3, '89202000', 'Rua Brasil', 'América', 'Joinville', 'SC'),
-('Pedro Santos', 'pedro@email.com', '123456', 3, '89203000', 'Rua XV de Novembro', 'Atiradores', 'Joinville', 'SC'),
-('Ana Costa', 'ana@railview.com', '123456', 2, '89204000', 'Rua Blumenau', 'Centro', 'Joinville', 'SC'),
-('Lucas Ferreira', 'lucas@email.com', '123456', 3, '89205000', 'Rua São Paulo', 'Bucarein', 'Joinville', 'SC');
-
-
-INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario) VALUES
-('Expresso Norte', 'Passageiros', 'Rail Brasil', 'Siemens Vectron', 8, 2),
-('Carga Pesada', 'Carga', 'TransLog', 'GE Evolution', 20, 2),
-('Expresso Sul', 'Passageiros', 'Rail Brasil', 'Alstom Coradia', 6, 3),
-('Trem Regional', 'Passageiros', 'Ferrovia Sul', 'CAF Civity', 5, 4),
-('Carga Express', 'Carga', 'TransLog', 'EMD SD70', 18, 5);
-
-
-INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem) VALUES
-('Velocidade', 'Vagao 01', 'Ativo', 'Rail Brasil', 1),
-('Temperatura', 'Motor principal', 'Ativo', 'Rail Brasil', 1),
-('GPS', 'Cabine', 'Ativo', 'Rail Brasil', 1),
-('Pressao', 'Sistema de freios', 'Manutencao', 'TransLog', 2),
-('Velocidade', 'Vagao 05', 'Ativo', 'TransLog', 2),
-('GPS', 'Cabine', 'Ativo', 'Rail Brasil', 3),
-('Temperatura', 'Motor principal', 'Inativo', 'Ferrovia Sul', 4),
-('Vibracao', 'Eixo traseiro', 'Ativo', 'TransLog', 5);
-
-INSERT INTO Rota (nome_rota, origem, destino, apelido, operadora, inicio_previsto, fim_previsto, relatorio) VALUES
-('Rota Norte', 'Joinville', 'Curitiba', 'Linha Norte', 'Rail Brasil', '2026-11-11 08:00:00', '2026-11-11 11:00:00', 'Viagem dentro da normalidade.'),
-('Rota Sul', 'Joinville', 'Florianopolis', 'Linha Sul', 'Ferrovia Sul', '2026-11-11 09:00:00', '2026-11-11 14:00:00', 'Operacao sem ocorrencias.'),
-('Rota Industrial', 'Curitiba', 'Sao Paulo', 'Linha Industrial', 'TransLog', '2026-11-11 10:00:00', '2026-11-11 18:00:00', 'Transporte de carga industrial.'),
-('Rota Litoranea', 'Itajai', 'Joinville', 'Linha Litoranea', 'Rail Brasil', '2026-11-12 07:00:00', '2026-11-12 10:00:00', 'Rota com monitoramento ativo.'),
-('Rota Central', 'Sao Paulo', 'Campinas', 'Linha Central', 'TransLog', '2026-11-12 13:00:00', '2026-11-12 16:00:00', 'Transporte realizado normalmente.');
-
-INSERT INTO Historico_Rota (data_inicio, data_fim, id_trem, id_rota) VALUES
-('2026-11-10 08:00:00', '2026-11-10 11:00:00', 1, 1),
-('2026-11-10 09:00:00', '2026-11-10 14:00:00', 3, 2),
-('2026-11-10 10:00:00', '2026-11-10 18:00:00', 2, 3),
-('2026-11-10 07:00:00', '2026-11-10 10:00:00', 4, 4),
-('2026-11-10 13:00:00', '2026-11-10 16:00:00', 5, 5);
-
-
-INSERT INTO Alerta (mensagem, data_alerta, nivel, id_sensor) VALUES
-('Velocidade acima do limite permitido.', '2026-11-11 08:30:00', 'Alto', 1),
-('Temperatura elevada no motor.', '2026-11-11 08:45:00', 'Medio', 2),
-('Falha na comunicacao GPS.', '2026-11-11 09:00:00', 'Alto', 3),
-('Pressao baixa no sistema de freios.', '2026-11-11 09:15:00', 'Critico', 4),
-('Vibracao acima do padrao.', '2026-11-11 09:30:00', 'Medio', 8),
-('Sensor de temperatura inativo.', '2026-11-11 10:00:00', 'Baixo', 7);
-
-
-INSERT INTO Manutencao (data_inicio, data_fim, descricao, id_trem) VALUES
-('2026-10-01', '2026-10-03', 'Revisao geral do motor.', 1),
-('2026-10-05', '2026-10-06', 'Substituicao do sistema de freios.', 2),
-('2026-10-08', '2026-10-09', 'Inspecao dos sistemas eletricos.', 3),
-('2026-10-12', '2026-10-14', 'Manutencao preventiva dos vagoes.', 4),
-('2026-10-15', '2026-10-17', 'Reparo no sistema de transmissao.', 5),
-('2026-11-11', NULL, 'Manutencao corretiva em andamento.', 2);

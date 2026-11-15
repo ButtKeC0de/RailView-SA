@@ -1,3 +1,5 @@
+> Pesquisa histórica: o projeto atual usa **mysqli**, com conexão em `infra/conexao.php` e consultas preparadas. Os exemplos PDO abaixo são material de estudo e não instruções de instalação.
+
 -------------------------------------------------------PHP Data Objects-------------------------------------------------------------------
 
 O que é o PDO:
@@ -67,6 +69,7 @@ R)Quando você pode mudar de banco de dados no futuro: Se hoje você usa MySQL e
 Quando a segurança é prioridade: Ele usa prepared statements (consultas preparadas), que separam os dados digitados pelo usuário do comando do banco, bloqueando o ataque de SQL Injection (invasão por formulários).
 Quando o projeto usa Orientação a Objetos: O PDO foi desenhado para retornar os dados do banco diretamente em formato de objetos, encaixando perfeitamente em códigos modernos.
 Quando você acessa mais de um banco ao mesmo tempo: Se o seu sistema precisa ler dados do MySQL e gravar logs no SQLite, você usa os mesmos comandos básicos para ambos.
+
 
 
 

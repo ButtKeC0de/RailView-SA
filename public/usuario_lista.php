@@ -42,8 +42,8 @@ $usuarios = $conexao->query(
                         <a href="usuario_cadastro.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
                             + Cadastrar usuário
                         </a>
-                        <a href="Perfil.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                            ← Meu perfil
+                        <a href="home.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
+                            ← Início
                         </a>
                     </div>
                 </div>
@@ -107,3 +107,4 @@ $usuarios = $conexao->query(
 </body>
 
 </html>
+

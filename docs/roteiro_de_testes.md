@@ -1,203 +1,84 @@
-# Roteiro de Testes — Rail View (Ferrorama)
+# Roteiro de testes — Rail View
 
-Roteiro para a equipe conferir, antes da apresentação, se tudo o que o enunciado pede está funcionando.
-Faça os testes **na ordem**: alguns usam dados criados nos testes anteriores.
+Status: **execução pendente**. A análise do código e os scripts CLI não substituem os testes abaixo. Preencha resultado, data, ambiente, commit e evidência somente após executar.
 
-Em cada teste, marque **✅ Passou** ou **❌ Falhou** na última coluna. Se falhar, anote o que aconteceu, crie um card no Kanban e tire print (vale como evidência).
+## Preparação
 
----
+1. Ligue Apache e MariaDB no XAMPP; confira a porta 3306.
+2. Use uma instalação de teste e faça backup antes de importar database/SA_ferrorama.sql.
+3. Abra http://localhost/RailView-SA/public/login.php.
+4. Use janelas separadas para os perfis. Contas demo: admin@demo.test, funcionario@demo.test e usuario@demo.test, todas com senha fictícia password.
+5. Use dados descartáveis nos testes de exclusão; não altere registros de terceiros.
 
-## 0. Preparação
+## Banco e autenticação
 
-| Passo | O que fazer |
-|---|---|
-| 1 | Ligue o **Apache** e o **MySQL** no painel do XAMPP. |
-| 2 | Confira a porta do MySQL no painel do XAMPP (normalmente **3306**). Ela precisa ser a mesma de `$porta` em `infra/conexao.php`. Se for diferente, o site não conecta no banco. |
-| 3 | No phpMyAdmin, importe `database/SA_ferrorama.sql`. Ele cria o banco `rail_view_db`, os perfis e o administrador inicial. |
-| 4 | Abra `http://localhost/Situacao_de_Aprendizagem-/` no navegador. |
-| 5 | Use uma **janela anônima** para o segundo usuário. Assim dá para ficar logado como admin e como usuário comum ao mesmo tempo. |
-
-### Dados de teste
-
-Os usuários abaixo são criados durante os testes. Só o `caio123` já vem no banco.
-
-| Usuário | Login | Senha | Perfil |
+| ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| caio123 | `caio123` | `caio123` | Administrador (já vem no SQL) |
-| Ana Admin | `ana@railview.com` | `senha12345` | Administrador |
-| Bruno Funcionário | `bruno@railview.com` | `senha12345` | Funcionário |
-| Carla Usuária | `carla@railview.com` | `senha12345` | Usuário |
+| T01 | Importar o SQL duas vezes | Sem erros; três contas demo, dois trens demo, dois sensores demo e duas rotas demo sem duplicação | |
+| T02 | Rodar php scripts/verificar_demo.php e php scripts/verificar_alertas.php | Ambos terminam com código zero | |
+| T03 | Rodar php -l em todos os PHP de infra, public e scripts | Nenhum erro de sintaxe | |
+| T04 | Entrar com cada uma das três contas demo | Login válido e nome/perfil corretos | |
+| T05 | Entrar com nome completo Admin Demo | Login também aceita o nome completo | |
+| T06 | Tentar senha incorreta, usuário inexistente e campos vazios | Não autentica; credenciais inválidas usam mensagem genérica | |
+| T07 | Visitar home.php e páginas de consulta sem sessão | Redirecionamento ao login | |
+| T08 | Visitar usuario_cadastro.php sem sessão | Redirecionamento ao login; cadastro exige administrador | |
+| T09 | Sair e tentar voltar a uma página protegida | Sessão encerrada; exige login | |
 
-| Trem | Modelo | Operadora | Tipo | Vagões |
-|---|---|---|---|---|
-| Expresso Sul | AC44 | Rumo | Carga | 40 |
-| Litorânea | GT46 | MRS | Passageiros | 8 |
+## Perfis e contas
 
-| Sensor | Localização | Operadora | Status | Trem |
-|---|---|---|---|---|
-| Temperatura | Km 12 - Joinville | Rumo | Ativo | Expresso Sul |
-| Velocidade | Km 30 - Araquari | MRS | Manutenção | Litorânea |
-
-| Rota | Operadora | Trem |
-|---|---|---|
-| Joinville → Curitiba | Rumo | Expresso Sul |
-| São Francisco do Sul → Joinville | MRS | Litorânea |
-
----
-
-## 1. Login e autenticação
-
-| # | Passo a passo | Resultado esperado | Resultado |
+| ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| T01 | Na tela de login, digite `caio123` e a senha `caio123`. Clique em **Entrar**. | Entra no sistema e abre a **Home**. | |
-| T02 | Faça logout. Entre de novo usando o email `caio123@railview.com` e a senha `caio123`. | Entra normalmente: o login aceita **email ou nome de usuário**. | |
-| T03 | Faça logout. Digite `caio123` com a senha `errada123`. | Aparece o alerta **"Usuário ou senha incorretos."** e **não** entra. | |
-| T04 | Digite um usuário que não existe (`fantasma@teste.com`) com qualquer senha. | Aparece a **mesma** mensagem do T03. O sistema não revela se o usuário existe. | |
-| T05 | Clique em **Entrar** com os campos vazios. | O navegador pede para preencher os campos e não envia. | |
-| T06 | Logado, abra `public/login.php` na barra de endereço. | Volta direto para a Home, sem pedir login de novo. | |
+| T10 | Como usuário e funcionário, consultar trens, sensores, rotas e alertas | Consultas disponíveis, ações administrativas ausentes | |
+| T11 | Como usuário, abrir diretamente cadastro/edição/exclusão de trem e sensor, lista de usuários e edição de rota | HTTP 403; nenhum registro alterado | |
+| T12 | Como usuário, tentar editar ou excluir outra conta | HTTP 403; conta preservada | |
+| T13 | Como único administrador, tentar excluir a própria conta ou mudar para Usuário | Operação bloqueada; permanece um admin | |
+| T14 | Como administrador, criar conta fictícia com cada perfil | Conta salva; senha com hash; email duplicado, senha curta e perfil inválido recusados | |
+| T15 | Alterar os próprios dados e senha | Persiste alteração; login posterior aceita nova senha | |
+| T16 | Rebaixar conta de teste logada em outra janela e recarregar | Permissão atualizada pelo banco sem novo login | |
+| T17 | Excluir conta de teste logada em outra janela e recarregar | Sessão invalidada e redirecionamento ao login | |
+| T18 | Usar o botão Início da lista de usuários | Abre home.php | |
 
-## 2. Senhas armazenadas com segurança
+## Trens, sensores e rotas
 
-| # | Passo a passo | Resultado esperado | Resultado |
+| ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| T07 | No phpMyAdmin, rode `SELECT nome, email, senha FROM Usuario;` | Nenhuma senha aparece em texto puro. Todas começam com **`$2y$10$`** (hash bcrypt do `password_hash()`). **Print para a apresentação.** | |
+| T19 | Cadastrar trem de teste com responsável existente | Trem salvo com responsável correto | |
+| T20 | Editar trem e consultar lista | Novos dados aparecem corretamente | |
+| T21 | Cadastrar e editar sensor, escolhendo trem e status | Dados e vínculo persistidos; status inválido recusado | |
+| T22 | Consultar sensor pelo ID e usar a pesquisa | Exibe o sensor solicitado e filtra conforme os dados | |
+| T23 | Cadastrar rota com trem, origem, destino e operadora | Rota e Historico_Rota salvos com vínculo coerente | |
+| T24 | Tentar origem e destino iguais ou trem inexistente | Operação recusada | |
+| T25 | Editar rota e trocar o trem | Lista mostra o trem escolhido | |
+| T26 | Tentar excluir trem com sensor ou rota | Exclusão bloqueada; vínculos preservados | |
+| T27 | Excluir rota e sensor descartáveis; depois excluir seu trem | Operações permitidas via POST; exclusão da rota remove o vínculo correspondente | |
+| T28 | Como admin, tentar exclusão por GET | Nenhum registro excluído | |
+| T29 | Informar texto com caracteres HTML nos campos | Saída mostra texto escapado, sem executar HTML ou JavaScript | |
+| T30 | Abrir Sensores pelo menu e pelo atalho da home | Ambos abrem sensor_lista.php, inclusive em servidor com caminhos sensíveis a maiúsculas | |
 
-## 3. Sessão do usuário
+## Limites e alertas
 
-| # | Passo a passo | Resultado esperado | Resultado |
+| ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| T08 | Antes de logar, aperte **F12** e vá em **Aplicativo → Cookies** (Chrome) ou **Armazenamento → Cookies** (Firefox). Anote o valor de `PHPSESSID`. Faça login e olhe de novo. | O `PHPSESSID` **muda** depois do login (`session_regenerate_id`), o que protege contra roubo de sessão. | |
-| T09 | Logado, abra **Trens**, **Sensores** e **Rotas**. | O **nome do usuário logado** aparece no canto superior direito. Ele vem da sessão (`$_SESSION['usuario_nome']`). | |
-| T10 | Clique no nome do usuário (canto superior) para abrir o **Meu Perfil**. | Mostra nome, email e perfil (cargo) do usuário logado. A página busca esses dados pelo ID guardado na sessão (`$_SESSION['usuario_id']`). | |
-| T11 | Feche a aba (sem logout), abra o site de novo no mesmo navegador e vá para `public/home.php`. | Continua logado: a sessão foi mantida. | |
+| T31 | Como admin, abrir Alertas e configurar máximo 80 km/h em sensor de teste | Limite aparece na tabela | |
+| T32 | Registrar leituras 79, 80 e 81, nessa ordem | Três leituras salvas; somente 81 gera alerta | |
+| T33 | Registrar falha sem valor | Leitura e alerta de falha salvos juntos | |
+| T34 | Remover o máximo com campo vazio e registrar 100 sem falha | Leitura salva sem alerta numérico | |
+| T35 | Informar leitura vazia sem falha, texto inválido ou sensor inexistente | Rejeita sem gravar leitura nem alerta | |
+| T36 | Como conta comum ou funcionário, tentar enviar POST de leitura/limite | HTTP 403; banco preservado | |
+| T37 | Como admin, enviar formulário sem token CSRF válido | HTTP 403; banco preservado | |
+| T38 | Consultar alertas e leituras com conta comum | Históricos visíveis, sem formulário administrativo | |
 
-## 4. Logout
+## Apresentação e validação externa
 
-| # | Passo a passo | Resultado esperado | Resultado |
+| ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| T12 | Clique no ícone de **Sair** na barra lateral. | Volta para a tela de login. | |
-| T13 | Depois do logout, digite `public/trens_home.php` na barra de endereço. | Vai para o **login**: a sessão foi encerrada. | |
-| T14 | Depois do logout, aperte **Voltar** no navegador e depois **F5**. | Ao recarregar, vai para o login. Sem o F5, o navegador pode mostrar a página antiga guardada em cache, mas ela não funciona mais. | |
+| T39 | Navegar em 375 px e em desktop | Conteúdo e controles utilizáveis; tabelas de alertas rolam horizontalmente | |
+| T40 | Conferir links, botões, mensagens e recursos externos | Nenhum link local quebrado; indisponibilidade externa identificada | |
+| T41 | Repetir roteiro com pessoa de fora da equipe | Registro real em teste_externo.md, com feedback e correções | |
+| T42 | Tirar capturas de login, home, módulos, alertas e tela pequena | Imagens reais inseridas no README e no MANUAL | |
 
-## 5. Acesso sem login
+## Limitações a declarar na avaliação
 
-Deslogado (ou numa janela anônima), abra cada endereço direto na barra:
+Funcionário tem as mesmas permissões de Usuário, divergindo de RN11–RN15 do documento original. Sensores se associam às rotas por meio do trem. Leituras são registradas manualmente; não existe integração com equipamento IoT. Estatísticas, manutenção, relatórios semanais, velocidade média e chegada automática ainda não estão implementados. Historico_Rota não é uma trilha imutável de viagens.
 
-| # | Endereço | Resultado esperado | Resultado |
-|---|---|---|---|
-| T15 | `public/home.php` | Vai para o login | |
-| T16 | `public/trens_home.php` e `public/trens_lista.php` | Vai para o login | |
-| T17 | `public/sensor_home.php` e `public/sensor_lista.php` | Vai para o login | |
-| T18 | `public/criacao_rotas.php` | Vai para o login | |
-| T19 | `public/Perfil.php` e `public/usuario_lista.php` | Vai para o login | |
-| T20 | `index.html`, `public/login.php`, `public/usuario_cadastro.php` | **Abrem normalmente** (são as únicas páginas públicas) | |
-
-## 6. CRUD de Usuários
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T21 | Deslogado, clique em **"Não possui conta? Cadastrar-se"**. Cadastre a **Carla** (`carla@railview.com` / `senha12345`), marcando os Termos de Uso. | Aparece **"Cadastro realizado! Agora é só entrar."** e volta para o login. | |
-| T22 | Tente cadastrar outra conta com o **mesmo email** da Carla. | Alerta **"Este email já está cadastrado."** | |
-| T23 | Tente cadastrar com **senha e confirmação diferentes**. | Alerta **"As senhas não coincidem."** | |
-| T24 | Cadastre-se sozinho com um email `teste@admin.com`. Depois entre como `caio123` e veja **Meu Perfil → Gerenciar usuários**. | A conta aparece com perfil **Usuário**: quem se cadastra sozinho **nunca** vira administrador. Depois exclua essa conta. | |
-| T25 | Como `caio123` (por enquanto o **único** administrador), vá em **Meu Perfil → Editar meus dados**, mude o próprio perfil para **Usuário** e salve. | Erro **"Este é o único administrador…"** e o perfil continua Administrador. O sistema nunca fica sem admin. | |
-| T26 | Ainda como `caio123`, clique em **Meu Perfil → Excluir minha conta**. | Erro **"Não é possível excluir o único administrador do sistema…"** e a conta continua existindo. | |
-| T27 | Vá em **Meu Perfil → Gerenciar usuários → + Cadastrar usuário**. Cadastre a **Ana** com perfil **Administrador** e o **Bruno** com perfil **Funcionário**. | Mensagem **"Usuário '…' cadastrado com sucesso!"**. Os dois aparecem na lista com o perfil certo. | |
-| T28 | Na lista de usuários, clique em **editar** (lápis) no Bruno, mude o nome para "Bruno Silva" e salve. | Mensagem **"atualizado com sucesso"**. O nome muda na lista. | |
-| T29 | Edite o Bruno colocando o email da Carla (`carla@railview.com`). | Erro **"Este email já está sendo usado por outro usuário."** | |
-| T30 | Edite o Bruno com nova senha `123`. | Erro **"A nova senha deve ter no mínimo 8 caracteres."** | |
-| T31 | Entre como **Carla**, vá em **Meu Perfil → Editar meus dados** e mude o nome dela. | Funciona. O campo **Perfil não aparece** para ela, porque só o admin muda perfil. | |
-| T32 | Crie uma conta de teste, entre com ela e clique em **Meu Perfil → Excluir minha conta**. | Pede confirmação, exclui e volta para o login. Essa conta não entra mais. | |
-
-## 7. CRUD de Trens
-
-Entre como **caio123** (admin).
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T33 | **Trens → Cadastrar**. Cadastre os 2 trens dos dados de teste. | Mensagem **"Trem '…' cadastrado com sucesso!"**. Os trens aparecem na lista e na tela de Trens. | |
-| T34 | Tente cadastrar um trem deixando **Modelo** vazio. | O formulário não envia (campo obrigatório). | |
-| T35 | Na tela **Trens**, digite o ID de um trem na busca. Depois clique no card do trem. | A busca filtra os cards. O clique abre a lista mostrando **só aquele trem**. | |
-| T36 | Na lista, clique em **editar** no "Litorânea" e mude os vagões para 10. | Mensagem **"atualizado com sucesso"**. O valor muda na lista. | |
-| T37 | Cadastre um trem extra "Trem Descarte" e **exclua** ele. | Pede confirmação e depois mostra **"…excluído com sucesso!"**. | |
-
-## 8. CRUD de Sensores (relacionamento Sensor → Trem)
-
-Como **caio123**:
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T38 | **Sensores → Cadastrar**. Cadastre os 2 sensores dos dados de teste, escolhendo o trem no campo de seleção. | Mensagem **"Sensor '…' cadastrado com sucesso!"**. | |
-| T39 | Abra a **lista de sensores**. | Cada card mostra **"TREM VINCULADO"** com o apelido e o modelo do trem certo. É o relacionamento funcionando. | |
-| T40 | Edite o sensor "Velocidade": mude o status para **Ativo** e o trem para **Expresso Sul**. | Mensagem **"Sensor atualizado com sucesso!"**. O card mostra o novo status e o novo trem. | |
-| T41 | Use a busca da lista e digite "Joinville". | Mostra só os sensores daquela localização. | |
-| T42 | Cadastre um sensor extra e exclua. | Pede confirmação e depois mostra **"Sensor excluído com sucesso!"**. | |
-
-## 9. CRUD de Rotas (relacionamento Rota → Trem)
-
-Como **caio123**:
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T43 | **Rotas**: cadastre as 2 rotas dos dados de teste, escolhendo o trem. | Mensagem **"Rota salva com sucesso!"**. A rota aparece na lista com o **ID do trem** e o apelido dele. | |
-| T44 | Tente cadastrar uma rota com **origem e destino iguais** (Joinville → Joinville). | Erro **"A origem e o destino precisam ser diferentes."** | |
-| T45 | Clique em **editar** (lápis) numa rota, troque o trem e salve. | O formulário vira **"Editar Rota #…"**, e depois de salvar a lista mostra o trem novo. | |
-| T46 | Digite "Curitiba" na pesquisa de rotas. | Filtra a lista e o contador mostra **"1 de 2 rotas encontradas"**. | |
-| T47 | Cadastre uma rota extra e clique em **excluir** (lixeira). | Pergunta **"Deseja excluir a rota …?"** e depois mostra **"Rota excluída."** | |
-| T48 | Exclua um trem que tem sensor e rota (crie um trem só para isso). | O trem some, os **sensores dele também somem** e a rota continua, mas com o trem **"—"**. As chaves estrangeiras usam `ON DELETE CASCADE`. | |
-
-## 10. Controle de acesso por perfil
-
-### 10.1 Administrador (caio123 ou Ana)
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T49 | Abra Trens, Sensores e Rotas. | Aparecem os botões **Cadastrar / Editar / Excluir** e o formulário de rotas. | |
-| T50 | Abra **Meu Perfil**. | Aparece o botão **"Gerenciar usuários"**. | |
-
-### 10.2 Usuário padrão (Carla) e Funcionário (Bruno)
-
-Entre como **Carla** numa janela anônima. Repita depois com o **Bruno**, que hoje tem as mesmas permissões do Usuário.
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T51 | Abra **Trens**. | Vê os trens, mas no lugar dos botões aparece só **"Consultar trens → Ver lista"**. A lista **não tem** a coluna Ações. | |
-| T52 | Abra **Sensores** e a lista de sensores. | Vê os sensores, mas **sem** os botões Editar/Excluir/Cadastrar. | |
-| T53 | Abra **Rotas**. | Vê a lista de rotas e a mensagem **"Você pode consultar as rotas. Apenas administradores cadastram, editam e excluem."**. Não aparece formulário nem os botões de editar/excluir. | |
-| T54 | Abra **Meu Perfil**. | **Não** aparece "Gerenciar usuários". | |
-
-### 10.3 Bloqueio no backend (o mais importante para a avaliação)
-
-Ainda como **Carla**, digite cada endereço **direto na barra** (troque `1` por um ID que exista):
-
-| # | Endereço | Resultado esperado | Resultado |
-|---|---|---|---|
-| T55 | `public/trens_cadastro.php` | **"Acesso negado: seu perfil não tem permissão para esta página."** | |
-| T56 | `public/trens_editar.php?id=1` | Acesso negado | |
-| T57 | `public/trens_excluir.php?id=1` | Acesso negado, e o trem **continua** na lista | |
-| T58 | `public/sensor_cadastro.php`, `sensor_editar.php?id=1`, `sensor_excluir.php?id=1` | Acesso negado nos três | |
-| T59 | `public/criacao_rotas.php?editar=1` | Acesso negado | |
-| T60 | `public/usuario_lista.php` | Acesso negado | |
-| T61 | `public/usuario_editar.php?id=1` (ID de **outro** usuário) | Acesso negado: ela só edita os próprios dados | |
-
-> **Por que isso importa:** o enunciado diz que só esconder botões não basta. Esses testes mostram que, mesmo sabendo o endereço, o usuário comum é barrado **pelo PHP no servidor** (`exigir_admin()` em `infra/auth.php`), que responde com o código HTTP **403**. Para provar na apresentação, aperte F12, vá na aba **Rede/Network** e mostre o status 403.
-
-| # | Passo a passo | Resultado esperado | Resultado |
-|---|---|---|---|
-| T62 | Deixe a Carla logada na janela anônima. Na janela normal, como `caio123`, mude o perfil dela para **Administrador**. Na janela da Carla, recarregue a tela de Trens. | Os botões de admin aparecem **sem ela precisar sair e entrar**: o perfil é conferido no banco a cada página. Depois, volte o perfil dela para **Usuário**. | |
-| T63 | Como `caio123`, exclua uma conta de teste que esteja logada em outra janela. Na outra janela, recarregue a página. | Vai para o login: a sessão de quem foi excluído deixa de valer. | |
-
----
-
-## 11. Problemas conhecidos (registrar no Kanban)
-
-Estes pontos **ainda não estão resolvidos**. Se forem aparecer na apresentação, informem a situação deles, como o enunciado pede.
-
-| # | Problema | Como reproduzir |
-|---|---|---|
-| P01 | O trem ainda **não tem usuário responsável** (o enunciado pede). | O cadastro de trem não tem esse campo. |
-| P02 | As mensagens de sucesso de Trem e Sensor não tratam HTML (**XSS**). | Cadastre um trem com apelido `<b>teste</b>`: a mensagem aparece em **negrito**. |
-| P03 | Trens e sensores são excluídos por **link (GET)**, e não por formulário (POST) como Usuários e Rotas. | Só o admin consegue (T57), mas o ideal é POST. |
-| P04 | O cadastro aceita **senha curta**, mas a edição exige 8 caracteres. | Cadastre-se com a senha `123`: o sistema aceita. |
-| P05 | Clicar num sensor na tela **Sensores** abre a lista com **todos** os sensores, não só o clicado. | Clique num card de sensor. |
-| P06 | A pesquisa sobre APIs (`pesquisas/apis.md`) ainda não existe. | — |
+Não marque esses requisitos como concluídos no Kanban sem implementar, testar ou registrar formalmente uma alteração de escopo aprovada.

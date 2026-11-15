@@ -21,8 +21,11 @@ $ativoUsuarios = strpos($paginaAtual, 'usuario_') === 0 ? 'ativo' : '';
         <a href="trens_home.php" title="Trens" class="<?= $ativoTrens ?>">
             <img src="../Assets/logos/icon_trem.png" alt="Trens">
         </a>
-        <a href="Sensor_lista.php" title="Sensores" class="<?= $ativoSensores ?>">
+        <a href="sensor_lista.php" title="Sensores" class="<?= $ativoSensores ?>">
             <img src="../Assets/logos/icon_sensores.png" alt="Sensores">
+        </a>
+        <a href="alertas.php" title="Leituras e alertas">
+            <span aria-hidden="true">⚠</span><span>Alertas</span>
         </a>
         <?php if (eh_admin()): ?>
         <a href="usuario_lista.php" title="Gerenciar usuários" class="<?= $ativoUsuarios ?>">
@@ -39,3 +42,4 @@ $ativoUsuarios = strpos($paginaAtual, 'usuario_') === 0 ? 'ativo' : '';
     </div>
 
 </aside>
+
