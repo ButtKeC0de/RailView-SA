@@ -84,7 +84,7 @@ $resultado = $conexao->query($sql);
 
                 <div class="estado-vazio estado-vazio--escuro estado-vazio--simples" style="grid-column: 1 / -1;">
                     <h3>Nenhum sensor cadastrado</h3>
-                    <?php if (eh_admin()): ?>
+                    <?php if (pode_editar()): ?>
                         <a href="sensor_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro sensor</a>
                     <?php endif; ?>
                 </div>
@@ -95,7 +95,7 @@ $resultado = $conexao->query($sql);
 
         <div class="parte_baixo_home">
 
-            <?php if (eh_admin()): ?>
+            <?php if (pode_editar()): ?>
 
             <div class="card_acao">
 

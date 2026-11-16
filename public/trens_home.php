@@ -72,7 +72,7 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
                 <div class="estado-vazio estado-vazio--escuro estado-vazio--simples" style="grid-column: 1 / -1;">
                     <h3>Nenhum trem cadastrado</h3>
-                    <?php if (eh_admin()): ?>
+                    <?php if (pode_editar()): ?>
                         <a href="trens_cadastro.php" class="botao_laranja text-decoration-none">+ Cadastrar primeiro trem</a>
                     <?php endif; ?>
                 </div>
@@ -83,7 +83,7 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
         <div class="parte_baixo_home">
 
-            <?php if (eh_admin()): ?>
+            <?php if (pode_editar()): ?>
 
             <div class="card_acao">
 

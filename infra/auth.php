@@ -11,6 +11,10 @@ function eh_admin(): bool
 {
     return ($_SESSION['id_perfil'] ?? null) === PERFIL_ADMIN;
 }
+function pode_editar(): bool
+{
+    return in_array($_SESSION['id_perfil'] ?? null, [PERFIL_ADMIN, PERFIL_FUNCIONARIO], true);
+}
 function encerrar_sessao(): void
 {
     $_SESSION = [];
@@ -43,6 +47,15 @@ function exigir_admin(): void
     exigir_login();
 
     if (!eh_admin()) {
+        negar_acesso();
+    }
+}
+
+function exigir_pode_editar(): void
+{
+    exigir_login();
+
+    if (!pode_editar()) {
         negar_acesso();
     }
 }

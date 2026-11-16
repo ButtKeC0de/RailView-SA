@@ -72,7 +72,7 @@ if ($resultado) {
 
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                     <h1 class="titulo m-0">Sensores Cadastrados</h1>
-                    <?php if (eh_admin()): ?>
+                    <?php if (pode_editar()): ?>
                     <a href="sensor_cadastro.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
                          Cadastrar Sensor
                     </a>
@@ -110,11 +110,12 @@ if ($resultado) {
                                                     <?= htmlspecialchars($sensor['status_sensor']) ?>
                                                 </span>
 
-                                                <?php if (eh_admin()): ?>
+                                                <?php if (pode_editar()): ?>
                                                 <a href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Editar">
                                                     Editar
                                                 </a>
 
+                                                <?php if (eh_admin()): ?>
                                                 <form action="sensor_excluir.php" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Tem certeza que deseja excluir este sensor?');">
                                                     <input type="hidden" name="id" value="<?= (int)$sensor['id_sensor'] ?>">
@@ -122,6 +123,7 @@ if ($resultado) {
                                                         Excluir
                                                     </button>
                                                 </form>
+                                                <?php endif; ?>
                                                 <?php endif; ?>
                                             </div>
 
@@ -157,7 +159,7 @@ if ($resultado) {
                     <?php else: ?>
                         <div class="estado-vazio estado-vazio--simples bg-white rounded-4">
                             <h3><?= $id ? 'Sensor não encontrado' : 'Nenhum sensor cadastrado' ?></h3>
-                            <?php if (eh_admin()): ?>
+                            <?php if (pode_editar()): ?>
                                 <a href="sensor_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro sensor</a>
                             <?php endif; ?>
                         </div>

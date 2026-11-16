@@ -72,7 +72,7 @@ if (isset($stmt)) {
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="titulo m-0">Trens Cadastrados</h1>
 
-                <?php if (eh_admin()): ?>
+                <?php if (pode_editar()): ?>
                     <a href="trens_cadastro.php"
                        class="btn btn-dark text-white rounded-pill px-4 py-2">
                         + Cadastrar Novo
@@ -103,7 +103,7 @@ if (isset($stmt)) {
                             <th>Vagões</th>
                             <th>Responsável</th>
 
-                            <?php if (eh_admin()): ?>
+                            <?php if (pode_editar()): ?>
                                 <th>Ações</th>
                             <?php endif; ?>
                         </tr>
@@ -174,7 +174,7 @@ if (isset($stmt)) {
                                         ) ?>
                                     </td>
 
-                                    <?php if (eh_admin()): ?>
+                                    <?php if (pode_editar()): ?>
                                         <td>
                                             <a
                                                 href="trens_editar.php?id=<?= (int)$trem['id_trem'] ?>"
@@ -184,6 +184,7 @@ if (isset($stmt)) {
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
 
+                                            <?php if (eh_admin()): ?>
                                             <form action="trens_excluir.php" method="POST" class="d-inline"
                                                   onsubmit="return confirm('Tem certeza que deseja excluir este trem?');">
                                                 <input type="hidden" name="id" value="<?= (int)$trem['id_trem'] ?>">
@@ -191,6 +192,7 @@ if (isset($stmt)) {
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
+                                            <?php endif; ?>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
@@ -200,12 +202,12 @@ if (isset($stmt)) {
 
                             <tr>
                                 <td
-                                    colspan="<?= eh_admin() ? 7 : 6 ?>"
+                                    colspan="<?= pode_editar() ? 7 : 6 ?>"
                                     class="p-0"
                                 >
                                     <div class="estado-vazio estado-vazio--simples">
                                         <h3><?= $id ? 'Trem não encontrado' : 'Nenhum trem cadastrado' ?></h3>
-                                        <?php if (eh_admin()): ?>
+                                        <?php if (pode_editar()): ?>
                                             <a href="trens_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro trem</a>
                                         <?php endif; ?>
                                     </div>

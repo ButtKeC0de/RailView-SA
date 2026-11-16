@@ -1,6 +1,6 @@
 <?php
 require_once '../infra/auth.php';
-exigir_admin();
+exigir_pode_editar();
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $mensagem = '';
