@@ -1,4 +1,3 @@
-SET NAMES utf8mb4;
 
 CREATE DATABASE IF NOT EXISTS rail_view_db
     CHARACTER SET utf8mb4
@@ -26,7 +25,6 @@ CREATE TABLE IF NOT EXISTS Usuario (
     senha VARCHAR(255) NOT NULL,
     id_perfil INT NOT NULL,
 
-  
     cep VARCHAR(9) NULL,
     logradouro VARCHAR(150) NULL,
     bairro VARCHAR(100) NULL,
@@ -40,9 +38,6 @@ CREATE TABLE IF NOT EXISTS Usuario (
         ON UPDATE CASCADE
 );
 
-
-
-
 CREATE TABLE IF NOT EXISTS Trem (
     id_trem INT AUTO_INCREMENT PRIMARY KEY,
     apelido VARCHAR(100) NOT NULL,
@@ -51,7 +46,6 @@ CREATE TABLE IF NOT EXISTS Trem (
     modelo VARCHAR(100) NOT NULL,
     numero_vagoes INT NOT NULL,
     id_usuario INT NULL,
-
 
     CONSTRAINT fk_trem_usuario
         FOREIGN KEY (id_usuario)
@@ -80,11 +74,7 @@ CREATE TABLE IF NOT EXISTS Rota (
     nome_rota VARCHAR(150) NOT NULL,
     origem VARCHAR(150) NOT NULL,
     destino VARCHAR(150) NOT NULL,
-    apelido VARCHAR(100),
-    operadora VARCHAR(150) NOT NULL,
-    inicio_previsto DATETIME,
-    fim_previsto DATETIME,
-    relatorio TEXT
+    operadora VARCHAR(150) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Historico_Rota (
@@ -94,13 +84,11 @@ CREATE TABLE IF NOT EXISTS Historico_Rota (
     id_trem INT NOT NULL,
     id_rota INT NOT NULL,
 
-
     CONSTRAINT historico_rota_ibfk_1
         FOREIGN KEY (id_trem)
         REFERENCES Trem(id_trem)
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
-
 
     CONSTRAINT historico_rota_ibfk_2
         FOREIGN KEY (id_rota)
@@ -109,53 +97,16 @@ CREATE TABLE IF NOT EXISTS Historico_Rota (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Alerta (
-    id_alerta INT AUTO_INCREMENT PRIMARY KEY,
-    mensagem VARCHAR(255) NOT NULL,
-    data_alerta DATETIME NOT NULL,
-    nivel VARCHAR(20),
-    id_sensor INT NOT NULL,
+DROP TABLE IF EXISTS Alerta;
+DROP TABLE IF EXISTS Leitura_Sensor;
+DROP TABLE IF EXISTS Limite_Sensor;
+DROP TABLE IF EXISTS Manutencao;
 
-    CONSTRAINT alerta_ibfk_1
-        FOREIGN KEY (id_sensor)
-        REFERENCES Sensor(id_sensor)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Limite_Sensor (
-    id_sensor INT PRIMARY KEY,
-    maximo DOUBLE NULL,
-    unidade VARCHAR(20) NOT NULL DEFAULT '',
-    CONSTRAINT limite_sensor_fk FOREIGN KEY (id_sensor)
-        REFERENCES Sensor(id_sensor) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Leitura_Sensor (
-    id_leitura INT AUTO_INCREMENT PRIMARY KEY,
-    id_sensor INT NOT NULL,
-    valor DOUBLE NULL,
-    falha TINYINT(1) NOT NULL DEFAULT 0,
-    unidade VARCHAR(20) NOT NULL DEFAULT '',
-    data_leitura DATETIME NOT NULL,
-    CONSTRAINT leitura_sensor_fk FOREIGN KEY (id_sensor)
-        REFERENCES Sensor(id_sensor) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Manutencao (
-    id_manutencao INT AUTO_INCREMENT PRIMARY KEY,
-    data_inicio DATE NOT NULL,
-    data_fim DATE,
-    descricao TEXT,
-    id_trem INT NOT NULL,
-
-    CONSTRAINT manutencao_ibfk_1
-        FOREIGN KEY (id_trem)
-        REFERENCES Trem(id_trem)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
+ALTER TABLE Rota
+    DROP COLUMN IF EXISTS apelido,
+    DROP COLUMN IF EXISTS inicio_previsto,
+    DROP COLUMN IF EXISTS fim_previsto,
+    DROP COLUMN IF EXISTS relatorio;
 
 ALTER DATABASE rail_view_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Perfil         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -164,11 +115,6 @@ ALTER TABLE Trem           CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 ALTER TABLE Sensor         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Rota           CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Historico_Rota CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE Alerta         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE Limite_Sensor  CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE Leitura_Sensor CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE Manutencao     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 
 ALTER TABLE Usuario
     ADD COLUMN IF NOT EXISTS cep VARCHAR(9) NULL AFTER id_perfil,
@@ -180,12 +126,10 @@ ALTER TABLE Usuario
 ALTER TABLE Trem
     ADD COLUMN IF NOT EXISTS id_usuario INT NULL AFTER numero_vagoes;
 
-
 UPDATE Trem
 SET id_usuario = NULL
 WHERE id_usuario IS NOT NULL
   AND id_usuario NOT IN (SELECT id_usuario FROM Usuario);
-
 
 ALTER TABLE Trem DROP FOREIGN KEY IF EXISTS fk_trem_usuario;
 ALTER TABLE Trem
@@ -211,52 +155,123 @@ ALTER TABLE Historico_Rota
         ON DELETE RESTRICT
         ON UPDATE CASCADE;
 
--- Contas exclusivamente fictícias. Senha pública de demonstração: password
--- O hash bcrypt é validado pelo script scripts/verificar_demo.php.
-START TRANSACTION;
-INSERT INTO Usuario (nome, email, senha, id_perfil) VALUES
-('Admin Demo', 'admin@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
-('Funcionario Demo', 'funcionario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-('Usuario Demo', 'usuario@demo.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3)
-ON DUPLICATE KEY UPDATE email = VALUES(email);
+INSERT IGNORE INTO Usuario (id_usuario, nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf)
+VALUES
+    (1,  'caio123',          'caio123@railview.com',  '$2y$10$1Ne6Q8VbsDZcU/0qcupHY.eDoISn6Bbrk3hA0tl9HcT2vf4RMceni', 1, NULL, NULL, NULL, NULL, NULL),
+    (2,  'carlos123',        'carlos123@railview.com','$2y$10$xGQhv/D39jFs7005Z/qlOu.xxld9/KgakRb8ORae46bv38cqXdW.u', 2, '89201-000', 'Rua do Príncipe', 'Centro', 'Joinville', 'SC'),
+    (3,  'lucas123',         'lucas123@railview.com', '$2y$10$q5m7nyt6A.zydE3kRX8Eq.Bc/DT9CItizxfHSZXYL5PM01YGo5Ocu', 3, '80010-000', 'Rua XV de Novembro', 'Centro', 'Curitiba', 'PR'),
+    (4,  'Carla Mendes',     'carla@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, '88010-000', 'Rua Felipe Schmidt', 'Centro', 'Florianópolis', 'SC'),
+    (5,  'Diego Rocha',      'diego@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, '89010-000', 'Rua XV de Novembro', 'Centro', 'Blumenau', 'SC'),
+    (6,  'Elisa Martins',    'elisa@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, NULL, NULL, NULL, NULL, NULL),
+    (7,  'Fábio Nunes',      'fabio@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, '83203-000', 'Rua Professor Cleto', 'Centro', 'Paranaguá', 'PR'),
+    (8,  'Gabriela Alves',   'gabriela@railview.com', '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, NULL, NULL, NULL, NULL, NULL),
+    (9,  'Henrique Costa',   'henrique@railview.com', '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, '89251-000', 'Rua Reinoldo Rau', 'Centro', 'Jaraguá do Sul', 'SC'),
+    (10, 'Isabela Ferreira', 'isabela@railview.com',  '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 2, NULL, NULL, NULL, NULL, NULL),
+    (11, 'João Pereira',     'joao@railview.com',     '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (12, 'Karina Ribeiro',   'karina@railview.com',   '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, '01001-000', 'Praça da Sé', 'Sé', 'São Paulo', 'SP'),
+    (13, 'Lucas Barbosa',    'lucas@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (14, 'Mariana Dias',     'mariana@railview.com',  '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (15, 'Nicolas Teixeira', 'nicolas@railview.com',  '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, '89218-000', 'Rua Blumenau', 'América', 'Joinville', 'SC'),
+    (16, 'Olivia Cardoso',   'olivia@railview.com',   '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (17, 'Pedro Gomes',      'pedro@railview.com',    '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (18, 'Rafaela Moreira',  'rafaela@railview.com',  '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (19, 'Samuel Araújo',    'samuel@railview.com',   '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL),
+    (20, 'Tatiane Lopes',    'tatiane@railview.com',  '$2y$10$6gX2c97wUqrHDnQ7GF89w.A.w0ogdgXo3yi.ablbjq/QBAqhX8HQe', 3, NULL, NULL, NULL, NULL, NULL);
 
--- Localiza as contas por email, sem presumir IDs de uma instalação anterior.
-SET @admin_demo = (SELECT id_usuario FROM Usuario WHERE email = 'admin@demo.test');
-INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario)
-SELECT 'Expresso Demo Norte', 'Passageiros', 'Ferrovia Demo', 'Modelo Demo A', 8, @admin_demo
-WHERE NOT EXISTS (SELECT 1 FROM Trem WHERE apelido = 'Expresso Demo Norte');
-INSERT INTO Trem (apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario)
-SELECT 'Carga Demo Sul', 'Carga', 'Ferrovia Demo', 'Modelo Demo B', 20, @admin_demo
-WHERE NOT EXISTS (SELECT 1 FROM Trem WHERE apelido = 'Carga Demo Sul');
-SET @trem_demo = (SELECT MIN(id_trem) FROM Trem WHERE apelido = 'Expresso Demo Norte');
-SET @carga_demo = (SELECT MIN(id_trem) FROM Trem WHERE apelido = 'Carga Demo Sul');
+INSERT IGNORE INTO Usuario (nome, email, senha, id_perfil)
+VALUES
+    ('caio123',   'caio123@railview.com',   '$2y$10$1Ne6Q8VbsDZcU/0qcupHY.eDoISn6Bbrk3hA0tl9HcT2vf4RMceni', 1),
+    ('carlos123', 'carlos123@railview.com', '$2y$10$xGQhv/D39jFs7005Z/qlOu.xxld9/KgakRb8ORae46bv38cqXdW.u', 2),
+    ('lucas123',  'lucas123@railview.com',  '$2y$10$q5m7nyt6A.zydE3kRX8Eq.Bc/DT9CItizxfHSZXYL5PM01YGo5Ocu', 3);
 
-INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem)
-SELECT 'Temperatura', 'Motor Demo A', 'Ativo', 'Ferrovia Demo', @trem_demo
-WHERE NOT EXISTS (SELECT 1 FROM Sensor WHERE id_trem = @trem_demo AND localizacao = 'Motor Demo A');
-INSERT INTO Sensor (tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem)
-SELECT 'Velocidade', 'Cabine Demo B', 'Manutenção', 'Ferrovia Demo', @carga_demo
-WHERE NOT EXISTS (SELECT 1 FROM Sensor WHERE id_trem = @carga_demo AND localizacao = 'Cabine Demo B');
+INSERT IGNORE INTO Trem (id_trem, apelido, tipo_trem, empresa_operadora, modelo, numero_vagoes, id_usuario)
+VALUES
+    (1,  'Expresso Sul',       'Carga',       'Rumo',          'AC44',     40, 1),
+    (2,  'Litorânea',          'Passageiros', 'MRS',           'GT46',      8, 2),
+    (3,  'Serra Verde',        'Passageiros', 'Serra Verde',   'G12',       6, 3),
+    (4,  'Gigante do Porto',   'Carga',       'Rumo',          'SD70',     60, 4),
+    (5,  'Vale Azul',          'Misto',       'VLI',           'C30',      20, 5),
+    (6,  'Cargueiro Norte',    'Carga',       'VLI',           'Dash 9',   55, 6),
+    (7,  'Estrela da Manhã',   'Passageiros', 'CPTM',          'Série 9500', 8, 7),
+    (8,  'Trem do Café',       'Misto',       'MRS',           'U20C',     15, 8),
+    (9,  'Rio Doce',           'Carga',       'Vale',          'ES58',     80, 9),
+    (10, 'Expresso Capital',   'Passageiros', 'CPTM',          'Série 8000', 8, 10),
+    (11, 'Granel 01',          'Carga',       'Rumo',          'AC44',     45, 1),
+    (12, 'Granel 02',          'Carga',       'Rumo',          'AC44',     45, 2),
+    (13, 'Bandeirante',        'Passageiros', 'TIC',           'Série 7000', 7, 3),
+    (14, 'Mineiro',            'Misto',       'Vale',          'BB40',     25, 4),
+    (15, 'Paraná Express',     'Carga',       'Rumo',          'SD40',     50, 5),
+    (16, 'Catarinense',        'Passageiros', 'MRS',           'GT26',      6, 6),
+    (17, 'Ferro Forte',        'Carga',       'VLI',           'SD70',     70, 7),
+    (18, 'Turístico do Vale',  'Passageiros', 'Serra Verde',   'G22',       5, 8),
+    (19, 'Litoral Norte',      'Misto',       'MRS',           'C36',      18, 9),
+    (20, 'Corujão',            'Carga',       'Rumo',          'Dash 9',   65, 10);
 
-INSERT INTO Rota (nome_rota, origem, destino, operadora)
-SELECT 'Rota Demo Norte', 'Joinville', 'Curitiba', 'Ferrovia Demo'
-WHERE NOT EXISTS (SELECT 1 FROM Rota WHERE nome_rota = 'Rota Demo Norte');
-INSERT INTO Rota (nome_rota, origem, destino, operadora)
-SELECT 'Rota Demo Sul', 'Joinville', 'Florianópolis', 'Ferrovia Demo'
-WHERE NOT EXISTS (SELECT 1 FROM Rota WHERE nome_rota = 'Rota Demo Sul');
-SET @rota_demo = (SELECT MIN(id_rota) FROM Rota WHERE nome_rota = 'Rota Demo Norte');
-SET @rota_carga = (SELECT MIN(id_rota) FROM Rota WHERE nome_rota = 'Rota Demo Sul');
-INSERT INTO Historico_Rota (data_inicio, id_trem, id_rota)
-SELECT '2026-11-15 08:00:00', @trem_demo, @rota_demo
-WHERE NOT EXISTS (SELECT 1 FROM Historico_Rota WHERE id_trem = @trem_demo AND id_rota = @rota_demo);
-INSERT INTO Historico_Rota (data_inicio, id_trem, id_rota)
-SELECT '2026-11-15 09:00:00', @carga_demo, @rota_carga
-WHERE NOT EXISTS (SELECT 1 FROM Historico_Rota WHERE id_trem = @carga_demo AND id_rota = @rota_carga);
-INSERT INTO Limite_Sensor (id_sensor, maximo, unidade)
-SELECT s.id_sensor, 80, CASE WHEN s.tipo_sensor = 'Temperatura' THEN '°C' ELSE 'km/h' END
-FROM Sensor s
-WHERE (s.id_trem = @trem_demo AND s.localizacao = 'Motor Demo A')
-   OR (s.id_trem = @carga_demo AND s.localizacao = 'Cabine Demo B')
-ON DUPLICATE KEY UPDATE id_sensor = VALUES(id_sensor);
-COMMIT;
+INSERT IGNORE INTO Sensor (id_sensor, tipo_sensor, localizacao, status_sensor, empresa_operadora, id_trem)
+VALUES
+    (1,  'Temperatura',  'Motor A',            'Ativo',      'Rumo',        1),
+    (2,  'Velocidade',   'Eixo 01',            'Ativo',      'MRS',         2),
+    (3,  'Presença',     'Vagão 03',           'Ativo',      'Serra Verde', 3),
+    (4,  'Vibração',     'Truque dianteiro',   'Manutenção', 'Rumo',        4),
+    (5,  'Temperatura',  'Freio traseiro',     'Ativo',      'VLI',         5),
+    (6,  'GPS',          'Cabine',             'Ativo',      'VLI',         6),
+    (7,  'Velocidade',   'Eixo 02',            'Inativo',    'CPTM',        7),
+    (8,  'Pressão',      'Sistema de freio',   'Ativo',      'MRS',         8),
+    (9,  'Peso',         'Vagão 10',           'Ativo',      'Vale',        9),
+    (10, 'Presença',     'Porta 02',           'Manutenção', 'CPTM',       10),
+    (11, 'Temperatura',  'Motor B',            'Ativo',      'Rumo',       11),
+    (12, 'Vibração',     'Eixo 04',            'Inativo',    'Rumo',       12),
+    (13, 'GPS',          'Cabine',             'Ativo',      'TIC',        13),
+    (14, 'Consumo',      'Tanque principal',   'Ativo',      'Vale',       14),
+    (15, 'Velocidade',   'Eixo 01',            'Ativo',      'Rumo',       15),
+    (16, 'Presença',     'Vagão 01',           'Ativo',      'MRS',        16),
+    (17, 'Temperatura',  'Motor A',            'Manutenção', 'VLI',        17),
+    (18, 'GPS',          'Cabine',             'Ativo',      'Serra Verde', 18),
+    (19, 'Pressão',      'Sistema de freio',   'Inativo',    'MRS',        19),
+    (20, 'Consumo',      'Tanque principal',   'Ativo',      'Rumo',       20);
 
+INSERT IGNORE INTO Rota (id_rota, nome_rota, origem, destino, operadora)
+VALUES
+    (1,  'Joinville - Curitiba',           'Joinville',      'Curitiba',        'Rumo'),
+    (2,  'Curitiba - Paranaguá',           'Curitiba',       'Paranaguá',       'Serra Verde'),
+    (3,  'São Paulo - Santos',             'São Paulo',      'Santos',          'MRS'),
+    (4,  'Belo Horizonte - Vitória',       'Belo Horizonte', 'Vitória',         'Vale'),
+    (5,  'Joinville - São Francisco do Sul','Joinville',     'São Francisco do Sul', 'Rumo'),
+    (6,  'Blumenau - Itajaí',              'Blumenau',       'Itajaí',          'MRS'),
+    (7,  'São Paulo - Jundiaí',            'São Paulo',      'Jundiaí',         'CPTM'),
+    (8,  'Campinas - Santos',              'Campinas',       'Santos',          'Rumo'),
+    (9,  'Uberaba - Santos',               'Uberaba',        'Santos',          'VLI'),
+    (10, 'São Paulo - Mogi das Cruzes',    'São Paulo',      'Mogi das Cruzes', 'CPTM'),
+    (11, 'Ponta Grossa - Paranaguá',       'Ponta Grossa',   'Paranaguá',       'Rumo'),
+    (12, 'Maringá - Paranaguá',            'Maringá',        'Paranaguá',       'Rumo'),
+    (13, 'São Paulo - Campinas',           'São Paulo',      'Campinas',        'TIC'),
+    (14, 'Itabira - Vitória',              'Itabira',        'Vitória',         'Vale'),
+    (15, 'Cascavel - Paranaguá',           'Cascavel',       'Paranaguá',       'Rumo'),
+    (16, 'Florianópolis - Joinville',      'Florianópolis',  'Joinville',       'MRS'),
+    (17, 'Araguari - Santos',              'Araguari',       'Santos',          'VLI'),
+    (18, 'Morretes - Curitiba',            'Morretes',       'Curitiba',        'Serra Verde'),
+    (19, 'Rio de Janeiro - Juiz de Fora',  'Rio de Janeiro', 'Juiz de Fora',    'MRS'),
+    (20, 'Rondonópolis - Santos',          'Rondonópolis',   'Santos',          'Rumo');
+
+INSERT IGNORE INTO Historico_Rota (id_historico, data_inicio, data_fim, id_trem, id_rota)
+VALUES
+    (1,  '2026-10-01 08:00:00', NULL, 1,  1),
+    (2,  '2026-10-02 09:30:00', NULL, 3,  2),
+    (3,  '2026-10-03 07:15:00', NULL, 2,  3),
+    (4,  '2026-10-04 06:00:00', NULL, 9,  4),
+    (5,  '2026-10-05 10:00:00', NULL, 4,  5),
+    (6,  '2026-10-06 11:20:00', NULL, 16, 6),
+    (7,  '2026-10-07 05:45:00', NULL, 7,  7),
+    (8,  '2026-10-08 13:00:00', NULL, 11, 8),
+    (9,  '2026-10-09 14:30:00', NULL, 6,  9),
+    (10, '2026-10-10 06:10:00', NULL, 10, 10),
+    (11, '2026-10-11 08:40:00', NULL, 12, 11),
+    (12, '2026-10-12 09:00:00', NULL, 15, 12),
+    (13, '2026-10-13 07:00:00', NULL, 13, 13),
+    (14, '2026-10-14 15:00:00', NULL, 14, 14),
+    (15, '2026-10-15 16:20:00', NULL, 20, 15),
+    (16, '2026-10-16 08:00:00', NULL, 19, 16),
+    (17, '2026-10-17 12:00:00', NULL, 17, 17),
+    (18, '2026-10-18 09:15:00', NULL, 18, 18),
+    (19, '2026-10-19 10:45:00', NULL, 8,  19),
+    (20, '2026-10-20 06:30:00', NULL, 5,  20);
