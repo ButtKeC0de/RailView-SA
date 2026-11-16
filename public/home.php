@@ -48,7 +48,7 @@ exigir_login();
                     <span class="atalho-seta" aria-hidden="true">&rarr;</span>
                 </a>
 
-                <a class="atalho" href="sensor_lista.php">
+                <a class="atalho" href="sensor_home.php">
                     <img src="../Assets/logos/icon_sensores.png" alt="">
                     <div>
                         <h2>Sensores</h2>
