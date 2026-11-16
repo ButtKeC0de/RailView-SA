@@ -24,9 +24,6 @@ $ativoUsuarios = strpos($paginaAtual, 'usuario_') === 0 ? 'ativo' : '';
         <a href="sensor_lista.php" title="Sensores" class="<?= $ativoSensores ?>">
             <img src="../Assets/logos/icon_sensores.png" alt="Sensores">
         </a>
-        <a href="alertas.php" title="Leituras e alertas">
-            <span aria-hidden="true">⚠</span><span>Alertas</span>
-        </a>
         <?php if (eh_admin()): ?>
         <a href="usuario_lista.php" title="Gerenciar usuários" class="<?= $ativoUsuarios ?>">
             <img class="icone-usuarios" src="../Assets/logos/icon_usuarios_contorno.png" alt="Gerenciar usuários">
