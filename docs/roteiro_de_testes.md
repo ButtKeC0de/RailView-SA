@@ -28,7 +28,8 @@ Status: **execução pendente**. A análise do código e os scripts CLI não sub
 
 | ID | Ação | Resultado esperado | Resultado / evidência |
 |---|---|---|---|
-| T10 | Como usuário e funcionário, consultar trens, sensores, rotas e alertas | Consultas disponíveis, ações administrativas ausentes | |
+| T10 | Como usuário, consultar trens, sensores, rotas e alertas | Consultas disponíveis, sem botões de cadastrar, editar ou excluir | |
+| T10b | Como funcionário, cadastrar e editar trem, sensor e rota; abrir trens_excluir.php e usuario_lista.php | Cadastro e edição funcionam; sem botão Excluir; exclusão e lista de usuários dão HTTP 403 | |
 | T11 | Como usuário, abrir diretamente cadastro/edição/exclusão de trem e sensor, lista de usuários e edição de rota | HTTP 403; nenhum registro alterado | |
 | T12 | Como usuário, tentar editar ou excluir outra conta | HTTP 403; conta preservada | |
 | T13 | Como único administrador, tentar excluir a própria conta ou mudar para Usuário | Operação bloqueada; permanece um admin | |
@@ -79,6 +80,6 @@ Status: **execução pendente**. A análise do código e os scripts CLI não sub
 
 ## Limitações a declarar na avaliação
 
-Funcionário tem as mesmas permissões de Usuário, divergindo de RN11–RN15 do documento original. Sensores se associam às rotas por meio do trem. Leituras são registradas manualmente; não existe integração com equipamento IoT. Estatísticas, manutenção, relatórios semanais, velocidade média e chegada automática ainda não estão implementados. Historico_Rota não é uma trilha imutável de viagens.
+Sensores se associam às rotas por meio do trem. Leituras são registradas manualmente; não existe integração com equipamento IoT. Estatísticas, manutenção, relatórios semanais, velocidade média e chegada automática ainda não estão implementados. Historico_Rota não é uma trilha imutável de viagens.
 
 Não marque esses requisitos como concluídos no Kanban sem implementar, testar ou registrar formalmente uma alteração de escopo aprovada.

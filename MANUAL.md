@@ -16,7 +16,7 @@ Digite o email e a senha e clique em Entrar. O login também aceita o nome compl
 
 ## Navegação e consultas
 
-O menu lateral dá acesso a Início, Rotas, Trens e Sensores. Clique no perfil para consultar seus dados. Funcionário e Usuário têm as mesmas permissões nesta versão: consultas e gerenciamento da própria conta.
+O menu lateral dá acesso a Início, Rotas, Trens e Sensores. Clique no perfil para consultar seus dados. O Funcionário também cadastra e edita trens, sensores e rotas, mas não exclui. O Usuário apenas consulta e gerencia a própria conta.
 
 ## Administração
 

@@ -34,11 +34,12 @@ Em bancos importados a partir da versão antiga, a importação não apaga nem a
 |---|---|---|---|
 | Consultar trens, sensores, rotas e alertas | Sim | Sim | Sim |
 | Configurar limites e registrar leituras | Sim | Não | Não |
-| Cadastrar, editar e excluir trens, sensores e rotas | Sim | Não | Não |
+| Cadastrar e editar trens, sensores e rotas | Sim | Sim | Não |
+| Excluir trens, sensores e rotas | Sim | Não | Não |
 | Listar e administrar outros usuários | Sim | Não | Não |
 | Consultar, editar e excluir a própria conta | Sim, respeitando o último admin | Sim | Sim |
 
-Funcionário e Usuário têm as mesmas permissões nesta versão. Isso diverge de RN11–RN15 do documento original, que atribui gestão operacional a Funcionário; essa mudança de escopo precisa ser validada pela equipe. As verificações ficam no backend; ocultar menus é apenas parte da interface. O cadastro de novas contas é administrativo.
+O Funcionário faz a gestão operacional (cadastrar e editar), como em RN11–RN15; excluir continua exclusivo do Administrador. As verificações ficam no backend; ocultar menus é apenas parte da interface. O cadastro de novas contas é administrativo.
 
 O último administrador não pode ser excluído nem rebaixado. Um trem com sensores ou rotas vinculados não pode ser excluído. A exclusão de rotas apaga os vínculos correspondentes em Historico_Rota.
 
