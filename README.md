@@ -16,15 +16,15 @@ A conexão está centralizada em `infra/conexao.php`, usando **mysqli** e utf8mb
 
 ## Demonstração
 
-Contas fictícias criadas pelo SQL, com senha pública **`password`** e hash bcrypt armazenado no banco. Não são credenciais pessoais e não devem ser usadas em produção.
+Contas fictícias criadas pelo SQL, exclusivas para demonstração local, com hash bcrypt armazenado no banco. Não devem ser usadas em produção.
 
-| Nome | Email | Perfil |
+| Login | Senha | Perfil |
 |---|---|---|
-| Admin Demo | admin@demo.test | Administrador |
-| Funcionario Demo | funcionario@demo.test | Funcionário |
-| Usuario Demo | usuario@demo.test | Usuário |
+| caio123 | caio123 | Administrador |
+| carlos123 | carlos123 | Funcionário |
+| lucas123 | lucas123 | Usuário |
 
-O login aceita email ou nome completo. Há dois trens, dois sensores e duas rotas de exemplo com vínculos coerentes, sem depender dos IDs de outras instalações.
+O login aceita o nome ou o email (`caio123@railview.com`, `carlos123@railview.com`, `lucas123@railview.com`). O SQL cria 20 usuários, 20 trens, 20 sensores e 20 rotas de exemplo com vínculos coerentes; os outros 17 usuários usam a senha `demo1234`.
 
 Em bancos importados a partir da versão antiga, a importação não apaga nem altera contas pessoais ou senhas antigas. Use um banco local limpo para a demonstração ou revise essas contas pela interface administrativa. Não utilize a antiga conta pessoal como acesso de apresentação.
 
@@ -32,8 +32,7 @@ Em bancos importados a partir da versão antiga, a importação não apaga nem a
 
 | Operação | Administrador | Funcionário | Usuário |
 |---|---|---|---|
-| Consultar trens, sensores, rotas e alertas | Sim | Sim | Sim |
-| Configurar limites e registrar leituras | Sim | Não | Não |
+| Consultar trens, sensores e rotas | Sim | Sim | Sim |
 | Cadastrar e editar trens, sensores e rotas | Sim | Sim | Não |
 | Excluir trens, sensores e rotas | Sim | Não | Não |
 | Listar e administrar outros usuários | Sim | Não | Não |
@@ -54,33 +53,23 @@ PHP, MariaDB, HTML, CSS, JavaScript e Bootstrap. Fontes, ícones, Bootstrap, con
 | `infra/` | Conexão mysqli, autenticação, mensagens e navegação |
 | `database/SA_ferrorama.sql` | Estrutura, migrações e dados fictícios |
 | `Assets/` | Estilos, logos, imagens e vídeos |
-| `scripts/` | JavaScript e verificação CLI dos hashes demo |
+| `scripts/` | JavaScript das telas (CEP, clima, buscas e termos de uso) |
 | `docs/` | Requisitos, diagramas, roteiro e evidências |
 | `MANUAL.md` | Manual rápido |
 
 ## Limitações conhecidas
 
 - Sensor pertence a um trem. Sua associação às rotas é indireta: Sensor → Trem → Historico_Rota → Rota. Isso precisa ser explicado na apresentação e validado com o critério 3.5.
-- Há registro manual de leituras, limites máximos por sensor e alertas automáticos por excesso ou falha, com histórico em public/alertas.php. Não há integração IoT física. Manutencao continua sem fluxo PHP. A tela mostra as últimas 100 leituras e os últimos 100 alertas; o banco preserva os anteriores até a exclusão do sensor.
+- Não há integração IoT física nem alertas automáticos: o status do sensor (Ativo, Inativo, Manutenção) é informado no cadastro.
 - Não há relatório operacional automatizado ou manutenção preditiva. Textos e campos de relatório não demonstram essas funcionalidades.
 - Historico_Rota é usado como vínculo de cadastro; a edição de rota atualiza o trem vinculado. Não constitui trilha imutável de viagens.
 - Responsividade, fluxos completos e funcionamento no computador da bancada ainda precisam de execução e evidências.
 
 ## Uso, testes e capturas
 
-Consulte o [manual rápido](MANUAL.md), o [roteiro de testes](docs/roteiro_de_testes.md), o [teste externo](docs/teste_externo.md) e a [lista de entrega](docs/entrega.md).
+Consulte o [manual rápido](MANUAL.md), o [roteiro de testes](docs/roteiro_de_testes.md) e o [teste externo](docs/teste_externo.md).
 
-As capturas reais ainda estão pendentes. A lista de telas e nomes dos arquivos está em [docs/evidencias](docs/evidencias/README.md). Não há teste de navegador concluído registrado nesta revisão.
-
-Com PHP instalado, execute na raiz:
-
-```powershell
-Get-ChildItem infra,public,scripts -Filter *.php -Recurse | ForEach-Object { php -l $_.FullName }
-php scripts/verificar_demo.php
-php scripts/verificar_alertas.php
-```
-
-A verificação dos hashes não depende do banco. Para conferir a reimportação, importe o SQL duas vezes em um banco de teste e compare a quantidade de contas e registros demo, depois valide os três logins. Não considere análise estática equivalente a teste funcional.
+As capturas de tela ainda estão pendentes.
 
 ## Equipe e contribuições
 
@@ -88,9 +77,9 @@ Os requisitos originais identificam Beatriz Fröhlich, Carlos Eduardo Buttke, Ca
 
 ## Organização e versão
 
-[Repositório](https://github.com/ButtKeC0de/RailView-SA) · [Kanban](https://github.com/users/ButtKeC0de/projects/2) · [Documentação](docs/README.md)
+[Repositório](https://github.com/ButtKeC0de/RailView-SA) · [Kanban](https://github.com/users/ButtKeC0de/projects/2) · [Release v1.0.0](https://github.com/ButtKeC0de/RailView-SA/releases/tag/v1.0.0)
 
-A preparação da versão v1.0.0 está descrita em [docs/entrega.md](docs/entrega.md). A existência de tag e release deve ser conferida no GitHub; documentação de preparação não significa publicação realizada.
+A pasta `docs/` reúne os requisitos, diagramas, mockup, pesquisas e materiais das etapas da SA.
 
 Licença: [MIT](LICENSE).
 

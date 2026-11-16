@@ -4,15 +4,15 @@
 
 Com Apache e MariaDB ligados e o banco importado conforme o [README](README.md), abra `http://localhost/RailView-SA/public/login.php`.
 
-As contas abaixo são fictícias, exclusivamente para demonstração local. A senha de todas é `password`.
+As contas abaixo são fictícias, exclusivamente para demonstração local.
 
-| Perfil | Email |
-|---|---|
-| Administrador | admin@demo.test |
-| Funcionário | funcionario@demo.test |
-| Usuário | usuario@demo.test |
+| Perfil | Login | Senha |
+|---|---|---|
+| Administrador | caio123 | caio123 |
+| Funcionário | carlos123 | carlos123 |
+| Usuário | lucas123 | lucas123 |
 
-Digite o email e a senha e clique em Entrar. O login também aceita o nome completo da conta. Use Sair para encerrar a sessão.
+Digite o login e a senha e clique em Entrar. O login também aceita o email da conta (por exemplo, `caio123@railview.com`). Use Sair para encerrar a sessão.
 
 ## Navegação e consultas
 
@@ -30,7 +30,7 @@ Um trem com sensores ou rotas vinculados não pode ser excluído. Remova os vín
 
 ## Sensores e rotas
 
-A associação é indireta: Sensor → Trem → Historico_Rota → Rota. Não há cadastro de sensor exclusivo de uma rota. Abra Alertas pelo menu lateral. O administrador pode configurar o máximo e a unidade de cada sensor e registrar leituras de demonstração. Uma leitura acima do máximo ou marcada como falha gera um alerta automaticamente. Valor igual ao máximo não gera alerta. Limite vazio desativa apenas a comparação numérica. Funcionário e Usuário consultam o histórico. Não há conexão física IoT nem gestão de manutenção.
+A associação é indireta: Sensor → Trem → Historico_Rota → Rota. Não há cadastro de sensor exclusivo de uma rota. Abra Sensores pelo menu lateral para ver os cards com o status de cada sensor; clique num card para abrir os detalhes. Não há conexão física IoT nem gestão de manutenção.
 
 ## Problemas frequentes
 
@@ -44,7 +44,7 @@ A associação é indireta: Sensor → Trem → Historico_Rota → Rota. Não h�
 
 ## Capturas de tela
 
-**Pendentes de execução real.** O manual ainda precisa das capturas de login, home, trens, sensores, rotas, usuários, alertas e tela pequena. Siga o [plano de evidências](docs/evidencias/README.md). Nenhuma imagem simulada serve como comprovação de funcionamento.
+**Pendentes de execução real.** O manual ainda precisa das capturas de login, home, trens, sensores, rotas, usuários e tela pequena. Nenhuma imagem simulada serve como comprovação de funcionamento.
 
 ## Suporte
 
