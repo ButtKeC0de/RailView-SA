@@ -141,11 +141,11 @@ if (isset($stmt)) {
                                     <?php
                                     $tipoMinusculo = mb_strtolower($trem['tipo_trem']);
 
-                                    if (str_contains($tipoMinusculo, 'carga')) {
+                                    if (strpos($tipoMinusculo, 'carga') !== false) {
                                         $classeTipo = 'tipo-carga';
-                                    } elseif (str_contains($tipoMinusculo, 'passag')) {
+                                    } elseif (strpos($tipoMinusculo, 'passag') !== false) {
                                         $classeTipo = 'tipo-passageiros';
-                                    } elseif (str_contains($tipoMinusculo, 'misto')) {
+                                    } elseif (strpos($tipoMinusculo, 'misto') !== false) {
                                         $classeTipo = 'tipo-misto';
                                     } else {
                                         $classeTipo = 'tipo-outro';
