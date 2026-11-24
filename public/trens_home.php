@@ -3,8 +3,19 @@
 require_once '../infra/auth.php';
 exigir_login();
 
-$sql = "SELECT * FROM Trem ORDER BY id_trem DESC";
-$resultado = $conexao->query($sql);
+$pesquisa = $_GET['pesquisa'] ?? '';
+
+if ($pesquisa != '') {
+    $pesquisaBanco = "%" . $pesquisa . "%";
+
+    $stmt = $conexao->prepare("SELECT * FROM Trem WHERE apelido LIKE ? OR id_trem LIKE ? ORDER BY id_trem DESC");
+    $stmt->bind_param("ss", $pesquisaBanco, $pesquisaBanco);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+} else {
+    $resultado = $conexao->query("SELECT * FROM Trem ORDER BY id_trem DESC");
+}
+
 $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
 ?>
@@ -41,10 +52,10 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
         </div>
 
-        <div class="busca">
-            <i class="bi bi-search"></i>
-            <input id="pesquisa"type="search" placeholder="ID:92462"autocomplete="off">
-        </div>
+        <form method="GET" action="trens_home.php" class="busca">
+            <input name="pesquisa" type="text" placeholder="Pesquisar trem" value="<?= htmlspecialchars($pesquisa) ?>">
+            <button type="submit">Pesquisar</button>
+        </form>
 
         <?php if (isset($_SESSION['mensagem'])): ?>
 
@@ -60,11 +71,11 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
 
                 <?php while ($trem = $resultado->fetch_assoc()): ?>
 
-                    <div class="trem"data-id="<?= (int)$trem['id_trem'] ?>">
+                    <a class="trem" href="trens_lista.php?id=<?= (int)$trem['id_trem'] ?>">
                         <img src="../Assets/logos/Logo.png" alt="Imagem do trem" >
                         <p>ID:<?= (int)$trem['id_trem'] ?></p>
                         <p><?= htmlspecialchars( $trem['apelido'],ENT_QUOTES,'UTF-8') ?></p>
-                    </div>
+                    </a>
 
                 <?php endwhile; ?>
 
@@ -135,8 +146,6 @@ $temRotas = $conexao->query("SELECT 1 FROM Rota LIMIT 1")->num_rows > 0;
     </div>
 
 </div>
-
-<script src="../scripts/home.js?v=3"></script>
 
 </body>
 

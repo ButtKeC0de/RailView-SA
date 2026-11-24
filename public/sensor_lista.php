@@ -11,6 +11,7 @@ if (isset($_SESSION['mensagem'])) {
 
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$pesquisa = trim($_GET['pesquisa'] ?? '');
 
 $select = "SELECT
                s.id_sensor,
@@ -28,6 +29,13 @@ if ($id) {
 
     $stmt = $conexao->prepare($select . " WHERE s.id_sensor = ?");
     $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $stmt->close();
+} elseif ($pesquisa !== '') {
+    $like = '%' . $pesquisa . '%';
+    $stmt = $conexao->prepare($select . " WHERE CAST(s.id_sensor AS CHAR) LIKE ? OR s.tipo_sensor LIKE ? OR s.localizacao LIKE ? OR s.empresa_operadora LIKE ? OR t.apelido LIKE ? ORDER BY s.id_sensor DESC");
+    $stmt->bind_param("sssss", $like, $like, $like, $like, $like);
     $stmt->execute();
     $resultado = $stmt->get_result();
     $stmt->close();
@@ -86,7 +94,10 @@ if ($resultado) {
                 <?php endif; ?>
 
                 <div class="mb-4">
-                    <input type="text" id="campoBusca" class="form-control input-busca" placeholder="Pesquisar por tipo, localização, operadora ou trem...">
+                    <form method="GET" action="sensor_lista.php" class="d-flex gap-2">
+                    <input type="text" name="pesquisa" class="form-control input-busca" placeholder="Pesquisar por tipo, localização, operadora ou trem..." value="<?= htmlspecialchars($pesquisa, ENT_QUOTES, 'UTF-8') ?>">
+                    <button type="submit" class="btn btn-dark">Pesquisar</button>
+                    </form>
                 </div>
 
                 <div id="listaSensores">
@@ -116,8 +127,7 @@ if ($resultado) {
                                                 </a>
 
                                                 <?php if (eh_admin()): ?>
-                                                <form action="sensor_excluir.php" method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Tem certeza que deseja excluir este sensor?');">
+                                                <form action="sensor_excluir.php" method="POST" class="d-inline">
                                                     <input type="hidden" name="id" value="<?= (int)$sensor['id_sensor'] ?>">
                                                     <button type="submit" class="btn btn-sm btn-danger text-white fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Excluir">
                                                         Excluir
@@ -171,23 +181,6 @@ if ($resultado) {
         </main>
 
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('campoBusca').addEventListener('keyup', function() {
-            const termo = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.item-sensor');
-
-            cards.forEach(card => {
-                const textoCard = card.textContent.toLowerCase();
-                if (textoCard.includes(termo)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>

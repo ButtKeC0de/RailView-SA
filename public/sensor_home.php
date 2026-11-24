@@ -4,8 +4,18 @@ require_once '../infra/auth.php';
 exigir_login();
 
 
-$sql = "SELECT * FROM Sensor ORDER BY id_sensor DESC";
-$resultado = $conexao->query($sql);
+$pesquisa = $_GET['pesquisa'] ?? '';
+
+if ($pesquisa != '') {
+    $pesquisaBanco = "%" . $pesquisa . "%";
+
+    $stmt = $conexao->prepare("SELECT * FROM Sensor WHERE localizacao LIKE ? OR tipo_sensor LIKE ? OR status_sensor LIKE ? OR id_sensor LIKE ? ORDER BY id_sensor DESC");
+    $stmt->bind_param("ssss", $pesquisaBanco, $pesquisaBanco, $pesquisaBanco, $pesquisaBanco);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+} else {
+    $resultado = $conexao->query("SELECT * FROM Sensor ORDER BY id_sensor DESC");
+}
 
 ?>
 
@@ -41,10 +51,10 @@ $resultado = $conexao->query($sql);
 
         </div>
 
-        <div class="busca">
-            <i class="bi bi-search"></i>
-            <input id="pesquisa"type="search"placeholder="ID do sensor"autocomplete="off">
-        </div>
+        <form method="GET" action="sensor_home.php" class="busca">
+            <input name="pesquisa" type="text" placeholder="Pesquisar sensor" value="<?= htmlspecialchars($pesquisa) ?>">
+            <button type="submit">Pesquisar</button>
+        </form>
 
         <?php if (isset($_SESSION['mensagem'])): ?>
 
@@ -60,7 +70,7 @@ $resultado = $conexao->query($sql);
 
                 <?php while ($sensor = $resultado->fetch_assoc()): ?>
 
-                    <div class="trem sensor" data-id="<?= (int)$sensor['id_sensor'] ?>" >
+                    <a class="trem sensor" href="sensor_lista.php?id=<?= (int)$sensor['id_sensor'] ?>" >
 
                         <img src="../Assets/logos/icon_sensores.png"alt="Sensor" >
                         <p>ID:<?= (int)$sensor['id_sensor'] ?></p>
@@ -76,7 +86,7 @@ $resultado = $conexao->query($sql);
                         ?>
                         <span class="status-sensor <?= $classeStatus ?>"><?= htmlspecialchars($sensor['status_sensor']) ?></span>
 
-                    </div>
+                    </a>
 
                 <?php endwhile; ?>
 
@@ -146,8 +156,6 @@ $resultado = $conexao->query($sql);
     </div>
 
 </div>
-
-<script src="../scripts/sensor_home.js?v=1"></script>
 
 </body>
 

@@ -7,6 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+exigir_confirmacao_exclusao('Deseja realmente excluir este usuário?');
+
 $id = filter_input(INPUT_POST, 'id_usuario', FILTER_VALIDATE_INT);
 $excluindoASiMesmo = $id === $_SESSION['usuario_id'];
 
@@ -32,9 +34,8 @@ if ((int)$usuario['id_perfil'] === PERFIL_ADMIN) {
     $totalAdmins = $conexao->query("SELECT COUNT(*) FROM Usuario WHERE id_perfil = " . PERFIL_ADMIN)->fetch_row()[0];
 
     if ($totalAdmins <= 1) {
-        $_SESSION['mensagem'] = "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+        $_SESSION['mensagem'] = "<div class='alert alert-danger' role='alert'>
                                     Não é possível excluir o único administrador do sistema. Promova outro usuário a administrador antes.
-                                    <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
                                 </div>";
         header("Location: $voltarPara");
         exit();
@@ -68,9 +69,8 @@ if ($excluindoASiMesmo) {
     exit();
 }
 
-$_SESSION['mensagem'] = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+$_SESSION['mensagem'] = "<div class='alert alert-success' role='alert'>
                             Usuário '<strong>" . htmlspecialchars($usuario['nome']) . "</strong>' excluído com sucesso!
-                            <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
                         </div>";
 header("Location: usuario_lista.php");
 exit();

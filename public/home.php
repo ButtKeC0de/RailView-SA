@@ -2,6 +2,17 @@
 require_once '../infra/auth.php';
 exigir_login();
 
+$temperaturaClima = 'Clima indisponível';
+$urlClima = 'https://api.open-meteo.com/v1/forecast?latitude=-26.3044&longitude=-48.8487&current=temperature_2m&temperature_unit=celsius&timezone=America%2FSao_Paulo';
+$respostaClima = @file_get_contents($urlClima);
+if ($respostaClima !== false) {
+    $dadosClima = json_decode($respostaClima, true);
+    $valorTemperatura = $dadosClima['current']['temperature_2m'] ?? null;
+    if (is_numeric($valorTemperatura)) {
+        $temperaturaClima = number_format((float)$valorTemperatura, 0, ',', '.') . ' °C';
+    }
+}
+
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -64,16 +75,14 @@ exigir_login();
                     <p id="clima-local">Joinville, SC</p>
                 </div>
 
-                <div class="clima-info" role="status" aria-live="polite" aria-busy="true">
-                    <strong id="clima-temperatura" class="clima-status">Consultando…</strong>
+                <div class="clima-info" role="status" aria-live="polite" aria-busy="false">
+                    <strong><?= htmlspecialchars($temperaturaClima, ENT_QUOTES, 'UTF-8') ?></strong>
                 </div>
 
             </section>
 
         </main>
     </div>
-
-    <script src="../scripts/clima.js"></script>
 </body>
 
 </html>

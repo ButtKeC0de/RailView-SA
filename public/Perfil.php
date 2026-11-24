@@ -78,13 +78,12 @@ $endereco = $partesEndereco ? implode(', ', $partesEndereco) : 'Não informado';
                     <h2 id="excluir-conta">Excluir minha conta</h2>
                     <p>Esta ação remove permanentemente seus dados de acesso.</p>
                 </div>
-                <form action="usuario_excluir.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.');">
+                <form action="usuario_excluir.php" method="POST">
                     <input type="hidden" name="id_usuario" value="<?= (int)$usuario['id_usuario'] ?>">
                     <button type="submit" class="conta-botao conta-perigo">Excluir minha conta</button>
                 </form>
             </section>
         </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -65,3 +65,23 @@ function negar_acesso(): void
     http_response_code(403);
     exit("Acesso negado: seu perfil não tem permissão para esta página. <a href='Perfil.php'>Voltar</a>");
 }
+
+function exigir_confirmacao_exclusao(string $mensagem): void
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || isset($_POST['confirmar_exclusao'])) {
+        return;
+    }
+
+    $acao = htmlspecialchars($_SERVER['PHP_SELF'] ?? '', ENT_QUOTES, 'UTF-8');
+    echo '<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Confirmar exclusão</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"></head><body class="bg-light"><main class="container py-5"><section class="card shadow-sm mx-auto" style="max-width:560px"><div class="card-body p-4"><h1 class="h4">Confirmar exclusão</h1><p>' . htmlspecialchars($mensagem, ENT_QUOTES, 'UTF-8') . '</p><form method="POST" action="' . $acao . '">';
+
+    foreach ($_POST as $chave => $valor) {
+        if ($chave === 'confirmar_exclusao' || is_array($valor)) {
+            continue;
+        }
+        echo '<input type="hidden" name="' . htmlspecialchars($chave, ENT_QUOTES, 'UTF-8') . '" value="' . htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    echo '<div class="d-flex gap-2"><button class="btn btn-danger" type="submit" name="confirmar_exclusao" value="1">Sim, excluir</button><a class="btn btn-outline-secondary" href="home.php">Cancelar</a></div></form></div></section></main></body></html>';
+    exit();
+}

@@ -6,6 +6,7 @@ $mensagem = $_SESSION['mensagem_rota'] ?? null;
 unset($_SESSION['mensagem_rota']);
 
 $rotaForm = ['id_rota' => null, 'id_trem' => '', 'origem' => '', 'destino' => '', 'operadora' => ''];
+$pesquisa = trim($_GET['pesquisa'] ?? '');
 
 if (($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['editar'])) && !pode_editar()) {
     negar_acesso();
@@ -13,6 +14,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['editar'])) && !pode_e
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (($_POST['acao'] ?? '') === 'excluir') {
+        exigir_confirmacao_exclusao('Deseja realmente excluir esta rota?');
         if (!eh_admin()) {
             negar_acesso();
         }
@@ -137,15 +139,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $trens = $conexao->query("SELECT id_trem, apelido FROM Trem ORDER BY apelido")->fetch_all(MYSQLI_ASSOC);
 
-$rotas = $conexao->query(
-    "SELECT r.id_rota, r.origem, r.destino, r.operadora, h.id_trem, t.apelido
+$sqlRotas = "SELECT r.id_rota, r.origem, r.destino, r.operadora, h.id_trem, t.apelido
      FROM Rota r
      LEFT JOIN Historico_Rota h ON h.id_historico = (
          SELECT MAX(id_historico) FROM Historico_Rota WHERE id_rota = r.id_rota
      )
-     LEFT JOIN Trem t ON t.id_trem = h.id_trem
-     ORDER BY r.id_rota DESC"
-)->fetch_all(MYSQLI_ASSOC);
+     LEFT JOIN Trem t ON t.id_trem = h.id_trem";
+if ($pesquisa !== '') {
+    $like = '%' . $pesquisa . '%';
+    $stmt = $conexao->prepare($sqlRotas . " WHERE r.origem LIKE ? OR r.destino LIKE ? OR r.operadora LIKE ? OR t.apelido LIKE ? OR CAST(r.id_rota AS CHAR) LIKE ? ORDER BY r.id_rota DESC");
+    $stmt->bind_param("sssss", $like, $like, $like, $like, $like);
+    $stmt->execute();
+    $rotas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} else {
+    $rotas = $conexao->query($sqlRotas . " ORDER BY r.id_rota DESC")->fetch_all(MYSQLI_ASSOC);
+}
 
 $editando = !empty($rotaForm['id_rota']);
 ?>
@@ -251,10 +260,11 @@ $editando = !empty($rotaForm['id_rota']);
                             <h2>Rotas Cadastradas</h2>
                         </div>
 
-                        <label class="pesquisa" for="pesquisarRota">
+                        <form class="pesquisa" method="GET" action="criacao_rotas.php">
                             <i class="bi bi-search" aria-hidden="true"></i>
-                            <input type="search" id="pesquisarRota" placeholder="Pesquisar rota" aria-label="Pesquisar rota por trem, origem ou destino">
-                        </label>
+                            <input type="search" id="pesquisarRota" name="pesquisa" value="<?= htmlspecialchars($pesquisa, ENT_QUOTES, 'UTF-8') ?>" placeholder="Pesquisar rota" aria-label="Pesquisar rota por trem, origem ou destino">
+                            <button type="submit">Pesquisar</button>
+                        </form>
                     </div>
 
                     <div id="listaRotas" aria-live="polite">
@@ -275,7 +285,7 @@ $editando = !empty($rotaForm['id_rota']);
                                         <i class="bi bi-pencil-fill" aria-hidden="true"></i>
                                     </a>
                                     <?php if (eh_admin()): ?>
-                                    <form method="POST" action="criacao_rotas.php" class="form-excluir" data-trajeto="<?= htmlspecialchars($rota['origem'] . ' → ' . $rota['destino']) ?>">
+                                    <form method="POST" action="criacao_rotas.php" class="form-excluir">
                                         <input type="hidden" name="acao" value="excluir">
                                         <input type="hidden" name="id_rota" value="<?= (int)$rota['id_rota'] ?>">
                                         <button class="btn-excluir" type="submit" aria-label="Excluir rota de <?= htmlspecialchars($rota['origem']) ?> para <?= htmlspecialchars($rota['destino']) ?>" title="Excluir rota">
@@ -289,9 +299,11 @@ $editando = !empty($rotaForm['id_rota']);
                         <?php endforeach; ?>
                     </div>
 
-                    <div id="estadoVazio" class="estado-vazio <?= $rotas ? 'oculto' : '' ?>">
-                        <h3>Nenhuma rota cadastrada</h3>
+                    <?php if (!$rotas): ?>
+                    <div id="estadoVazio" class="estado-vazio">
+                        <h3><?= $pesquisa !== '' ? 'Nenhuma rota encontrada' : 'Nenhuma rota cadastrada' ?></h3>
                     </div>
+                    <?php endif; ?>
                 </article>
             </section>
 
@@ -310,8 +322,6 @@ $editando = !empty($rotaForm['id_rota']);
             </section>
         </main>
     </div>
-
-    <script src="../scripts/rota.js"></script>
 </body>
 
 </html>

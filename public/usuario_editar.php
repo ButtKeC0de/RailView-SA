@@ -83,7 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             $_SESSION['mensagem'] = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
                                         Usuário '<strong>" . htmlspecialchars($nome) . "</strong>' atualizado com sucesso!
-                                        <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
                                     </div>";
 
             if ($editandoASiMesmo) {
@@ -170,6 +169,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </section>
         </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

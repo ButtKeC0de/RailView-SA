@@ -84,7 +84,7 @@ $usuarios = $conexao->query(
                                             <i class="bi bi-pencil-fill"></i>
                                         </a>
 
-                                        <form action="usuario_excluir.php" method="POST" class="d-inline" onsubmit="return confirm(<?= htmlspecialchars(json_encode('Tem certeza que deseja excluir o usuário ' . $usuario['nome'] . '?')) ?>);">
+                                        <form action="usuario_excluir.php" method="POST" class="d-inline">
                                             <input type="hidden" name="id_usuario" value="<?= (int)$usuario['id_usuario'] ?>">
                                             <button type="submit" class="btn btn-danger btn-sm rounded-3" title="Excluir">
                                                 <i class="bi bi-trash-fill"></i>
@@ -102,8 +102,6 @@ $usuarios = $conexao->query(
         </main>
 
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

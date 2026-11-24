@@ -3,7 +3,7 @@ $host = getenv('RAILVIEW_DB_HOST') ?: 'localhost';
 $usuario = getenv('RAILVIEW_DB_USER') ?: 'root';
 $senha = getenv('RAILVIEW_DB_PASSWORD') !== false ? getenv('RAILVIEW_DB_PASSWORD') : '';
 $banco = getenv('RAILVIEW_DB_NAME') ?: 'rail_view_db';
-$porta = (int)(getenv('RAILVIEW_DB_PORT') ?: 3310);
+$porta = (int)(getenv('RAILVIEW_DB_PORT') ?: 3307);
 
 try {
     $conexao = new mysqli($host, $usuario, $senha, $banco, $porta);

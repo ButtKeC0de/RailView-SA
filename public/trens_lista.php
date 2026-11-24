@@ -185,8 +185,7 @@ if (isset($stmt)) {
                                             </a>
 
                                             <?php if (eh_admin()): ?>
-                                            <form action="trens_excluir.php" method="POST" class="d-inline"
-                                                  onsubmit="return confirm('Tem certeza que deseja excluir este trem?');">
+                                            <form action="trens_excluir.php" method="POST" class="d-inline">
                                                 <input type="hidden" name="id" value="<?= (int)$trem['id_trem'] ?>">
                                                 <button type="submit" class="btn btn-danger btn-sm rounded-3" title="Excluir">
                                                     <i class="bi bi-trash-fill"></i>
@@ -223,7 +222,5 @@ if (isset($stmt)) {
         </section>
     </main>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
