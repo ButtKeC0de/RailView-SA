@@ -133,11 +133,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../Assets/css/conta.css">
-    <link rel="stylesheet" href="../Assets/css/sidebar.css">
+    <link rel="stylesheet" href="../Assets/css/conta.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sidebar.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sistema.css?v=2">
 </head>
 
-<body class="conta">
+<body class="conta pagina">
     <div class="tela">
         <?php require '../infra/sidebar.php'; ?>
         <main class="conteudo">

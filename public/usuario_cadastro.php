@@ -188,11 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../Assets/css/sidebar.css">
-    <link rel="stylesheet" href="../Assets/css/gestao.css">
+    <link rel="stylesheet" href="../Assets/css/sidebar.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/gestao.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sistema.css?v=2">
 </head>
 
-<body class="cadastro-usuarios">
+<body class="cadastro-usuarios pagina">
     <div class="tela">
         <?php require '../infra/sidebar.php'; ?>
         <main class="conteudo">
@@ -247,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?php endif; ?>
                             </div>
                             <div class="cadastro-campo">
-                                <label for="logradouro">Logradouro</label>
+                                <label for="logradouro">Rua</label>
                                 <input type="text" id="logradouro" name="logradouro" autocomplete="address-line1" value="<?= htmlspecialchars($logradouro ?? '') ?>" <?= $enderecoBloqueado ? 'readonly' : '' ?>>
                             </div>
                             <div class="cadastro-campo">
