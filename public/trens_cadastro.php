@@ -257,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </fieldset>
 
                     <div class="cadastro-acoes">
-                        <a href="trens_lista.php" class="cadastro-botao cadastro-voltar">← Ver Lista</a>
+                        <a href="trens_home.php" class="cadastro-botao cadastro-voltar">← Ver Lista</a>
                         <button
                             type="submit"
                             class="cadastro-botao cadastro-salvar"

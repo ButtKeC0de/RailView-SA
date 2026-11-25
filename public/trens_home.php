@@ -62,7 +62,6 @@ if ($pesquisa != '') {
 
                     <div class="acoes">
                         <?php if (pode_editar()): ?>
-                            <a href="trens_lista.php" class="botao botao-secundario">Gerenciar trens</a>
                             <a href="trens_cadastro.php" class="botao botao-primario">Cadastrar trem</a>
                         <?php else: ?>
                             <a href="trens_lista.php" class="botao botao-secundario">Ver lista</a>
