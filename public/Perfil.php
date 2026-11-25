@@ -2,26 +2,38 @@
 require_once '../infra/auth.php';
 exigir_login();
 
-$stmt = $conexao->prepare(
-    "SELECT u.id_usuario, u.nome, u.email, p.nome_perfil,
-            u.logradouro, u.bairro, u.cidade, u.uf, u.cep
-     FROM Usuario u
-     JOIN Perfil p ON p.id_perfil = u.id_perfil
-     WHERE u.id_usuario = ?"
-);
+$sql = "SELECT u.id_usuario, u.nome, u.email, p.nome_perfil,
+               u.logradouro, u.bairro, u.cidade, u.uf, u.cep
+        FROM Usuario u
+        JOIN Perfil p ON p.id_perfil = u.id_perfil
+        WHERE u.id_usuario = ?";
+$stmt = $conexao->prepare($sql);
 $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
-$usuario = $stmt->get_result()->fetch_assoc();
+$resultado = $stmt->get_result();
+$usuario = $resultado->fetch_assoc();
 $stmt->close();
 
-$partesEndereco = array_filter([
+$camposEndereco = [
     $usuario['logradouro'],
     $usuario['bairro'],
     $usuario['cidade'],
     $usuario['uf'],
-    $usuario['cep'],
-]);
-$endereco = $partesEndereco ? implode(', ', $partesEndereco) : 'Não informado';
+    $usuario['cep']
+];
+
+$partesEndereco = [];
+foreach ($camposEndereco as $campo) {
+    if (!empty($campo)) {
+        $partesEndereco[] = $campo;
+    }
+}
+
+if (count($partesEndereco) > 0) {
+    $endereco = implode(', ', $partesEndereco);
+} else {
+    $endereco = 'Não informado';
+}
 ?>
 <!doctype html>
 <html lang="pt-br">

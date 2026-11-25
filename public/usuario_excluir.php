@@ -16,12 +16,17 @@ if (!$excluindoASiMesmo && !eh_admin()) {
     negar_acesso();
 }
 
-$voltarPara = $excluindoASiMesmo ? 'Perfil.php' : 'usuario_lista.php';
+if ($excluindoASiMesmo) {
+    $voltarPara = 'Perfil.php';
+} else {
+    $voltarPara = 'usuario_lista.php';
+}
 
 $stmt = $conexao->prepare("SELECT nome, id_perfil FROM Usuario WHERE id_usuario = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$usuario = $stmt->get_result()->fetch_assoc();
+$resultado = $stmt->get_result();
+$usuario = $resultado->fetch_assoc();
 $stmt->close();
 
 if (!$usuario) {
@@ -31,7 +36,10 @@ if (!$usuario) {
 }
 
 if ((int)$usuario['id_perfil'] === PERFIL_ADMIN) {
-    $totalAdmins = $conexao->query("SELECT COUNT(*) FROM Usuario WHERE id_perfil = " . PERFIL_ADMIN)->fetch_row()[0];
+    $sql = "SELECT COUNT(*) AS total FROM Usuario WHERE id_perfil = " . PERFIL_ADMIN;
+    $resultado = $conexao->query($sql);
+    $linha = $resultado->fetch_assoc();
+    $totalAdmins = (int)$linha['total'];
 
     if ($totalAdmins <= 1) {
         $_SESSION['mensagem'] = "<div class='alert alert-danger' role='alert'>

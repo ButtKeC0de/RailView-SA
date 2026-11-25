@@ -2,12 +2,11 @@
 require_once '../infra/auth.php';
 exigir_admin();
 
-$usuarios = $conexao->query(
-    "SELECT u.id_usuario, u.nome, u.email, u.id_perfil, p.nome_perfil
-     FROM Usuario u
-     JOIN Perfil p ON p.id_perfil = u.id_perfil
-     ORDER BY u.id_perfil, u.nome"
-)->fetch_all(MYSQLI_ASSOC);
+$sql = "SELECT u.id_usuario, u.nome, u.email, u.id_perfil, p.nome_perfil
+        FROM Usuario u
+        JOIN Perfil p ON p.id_perfil = u.id_perfil
+        ORDER BY u.id_perfil, u.nome";
+$resultado = $conexao->query($sql);
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -66,12 +65,13 @@ $usuarios = $conexao->query(
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($usuarios as $usuario): ?>
-                                <?php $ehVoce = (int)$usuario['id_usuario'] === $_SESSION['usuario_id']; ?>
+                            <?php while ($usuario = $resultado->fetch_assoc()): ?>
                                 <tr>
                                     <td class="fw-bold">
                                         <?= htmlspecialchars($usuario['nome']) ?>
-                                        <?= $ehVoce ? '<span class="text-muted fw-normal">(você)</span>' : '' ?>
+                                        <?php if ($usuario['id_usuario'] == $_SESSION['usuario_id']): ?>
+                                            <span class="text-muted fw-normal">(você)</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($usuario['email']) ?></td>
                                     <td>
@@ -92,7 +92,7 @@ $usuarios = $conexao->query(
                                         </form>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>

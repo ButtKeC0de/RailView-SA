@@ -16,23 +16,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === '' || $senha === '') {
         $erro = 'Preencha o usuário e a senha.';
     } else {
-        $stmt = $conexao->prepare(
-            "SELECT id_usuario, nome, senha, id_perfil FROM Usuario WHERE email = ? OR nome = ?"
-        );
+        $sql = "SELECT id_usuario, nome, senha, id_perfil FROM Usuario WHERE email = ? OR nome = ?";
+        $stmt = $conexao->prepare($sql);
         $stmt->bind_param("ss", $email, $email);
         $stmt->execute();
-        $encontrados = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        $stmt->close();
+        $resultado = $stmt->get_result();
 
         $usuario = null;
-        foreach ($encontrados as $encontrado) {
-            if (password_verify($senha, $encontrado['senha'])) {
-                $usuario = $encontrado;
-                break;
+        while ($linha = $resultado->fetch_assoc()) {
+            if ($usuario === null && password_verify($senha, $linha['senha'])) {
+                $usuario = $linha;
             }
         }
+        $stmt->close();
 
-        if ($usuario) {
+        if ($usuario !== null) {
             session_regenerate_id(true);
 
             $_SESSION['usuario_id'] = (int)$usuario['id_usuario'];

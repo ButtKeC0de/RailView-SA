@@ -2,19 +2,28 @@
 require_once '../infra/auth.php';
 exigir_login();
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?: $_SESSION['usuario_id'];
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$id) {
+    $id = $_SESSION['usuario_id'];
+}
+
 $editandoASiMesmo = $id === $_SESSION['usuario_id'];
 
 if (!$editandoASiMesmo && !eh_admin()) {
     negar_acesso();
 }
 
-$voltarPara = (eh_admin() && !$editandoASiMesmo) ? 'usuario_lista.php' : 'Perfil.php';
+if (eh_admin() && !$editandoASiMesmo) {
+    $voltarPara = 'usuario_lista.php';
+} else {
+    $voltarPara = 'Perfil.php';
+}
 
 $stmt = $conexao->prepare("SELECT id_usuario, nome, email, id_perfil FROM Usuario WHERE id_usuario = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$usuario = $stmt->get_result()->fetch_assoc();
+$resultado = $stmt->get_result();
+$usuario = $resultado->fetch_assoc();
 $stmt->close();
 
 if (!$usuario) {
@@ -23,7 +32,12 @@ if (!$usuario) {
     exit();
 }
 
-$perfis = $conexao->query("SELECT id_perfil, nome_perfil FROM Perfil ORDER BY id_perfil")->fetch_all(MYSQLI_ASSOC);
+$perfis = [];
+$resultadoPerfis = $conexao->query("SELECT id_perfil, nome_perfil FROM Perfil ORDER BY id_perfil");
+while ($perfil = $resultadoPerfis->fetch_assoc()) {
+    $perfis[] = $perfil;
+}
+
 $mensagem = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -32,9 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $novaSenha = $_POST['nova_senha'] ?? '';
     $confirmaSenha = $_POST['confirma_senha'] ?? '';
 
-    $id_perfil = eh_admin()
-        ? filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT)
-        : (int)$usuario['id_perfil'];
+    if (eh_admin()) {
+        $id_perfil = filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT);
+    } else {
+        $id_perfil = (int)$usuario['id_perfil'];
+    }
 
     $usuario['nome'] = $nome;
     $usuario['email'] = $email;
@@ -47,24 +63,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $erro = 'Nome e email podem ter no máximo 100 caracteres.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erro = 'Digite um email válido.';
-    } elseif (!in_array($id_perfil, [PERFIL_ADMIN, PERFIL_FUNCIONARIO, PERFIL_USUARIO], true)) {
+    } elseif ($id_perfil !== PERFIL_ADMIN && $id_perfil !== PERFIL_FUNCIONARIO && $id_perfil !== PERFIL_USUARIO) {
         $erro = 'Perfil inválido.';
     } elseif ($novaSenha !== '' && mb_strlen($novaSenha) < 8) {
         $erro = 'A nova senha deve ter no mínimo 8 caracteres.';
     } elseif ($novaSenha !== $confirmaSenha) {
         $erro = 'As senhas não coincidem.';
-    } else {
+    }
+
+    if ($erro === '') {
         $stmt = $conexao->prepare("SELECT id_usuario FROM Usuario WHERE email = ? AND id_usuario <> ?");
         $stmt->bind_param("si", $email, $id);
         $stmt->execute();
-        if ($stmt->get_result()->num_rows > 0) {
+        $resultado = $stmt->get_result();
+
+        if ($resultado->num_rows > 0) {
             $erro = 'Este email já está sendo usado por outro usuário.';
         }
         $stmt->close();
     }
 
     if ($erro === '' && (int)$usuario['id_perfil'] === PERFIL_ADMIN && $id_perfil !== PERFIL_ADMIN) {
-        $totalAdmins = $conexao->query("SELECT COUNT(*) FROM Usuario WHERE id_perfil = " . PERFIL_ADMIN)->fetch_row()[0];
+        $sql = "SELECT COUNT(*) AS total FROM Usuario WHERE id_perfil = " . PERFIL_ADMIN;
+        $resultado = $conexao->query($sql);
+        $linha = $resultado->fetch_assoc();
+        $totalAdmins = (int)$linha['total'];
+
         if ($totalAdmins <= 1) {
             $erro = 'Este é o único administrador. Promova outro usuário a administrador antes de mudar este perfil.';
         }
@@ -84,11 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['mensagem'] = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
                                         Usuário '<strong>" . htmlspecialchars($nome) . "</strong>' atualizado com sucesso!
                                     </div>";
-
-            if ($editandoASiMesmo) {
-                $voltarPara = 'Perfil.php';
-            }
-
+            $stmt->close();
             header("Location: $voltarPara");
             exit();
         }
@@ -97,7 +117,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 
-    $usuario['id_perfil'] = $id_perfil ?: $usuario['id_perfil'];
+    if ($id_perfil) {
+        $usuario['id_perfil'] = $id_perfil;
+    }
     $mensagem = "<div class='alert alert-danger'>" . htmlspecialchars($erro) . "</div>";
 }
 ?>

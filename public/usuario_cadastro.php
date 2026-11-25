@@ -16,6 +16,7 @@ $uf = '';
 $id_perfil = PERFIL_USUARIO;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $nome = trim($_POST['nome'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
@@ -26,17 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bairro = trim($_POST['bairro'] ?? '');
     $cidade = trim($_POST['cidade'] ?? '');
     $uf = strtoupper(trim($_POST['uf'] ?? ''));
+
     $id_perfil = filter_input(INPUT_POST, 'id_perfil', FILTER_VALIDATE_INT);
     if ($id_perfil === null) {
         $id_perfil = PERFIL_USUARIO;
     }
 
+    $cepNumeros = preg_replace('/\D/', '', $cep);
+
     if (isset($_POST['buscar_cep'])) {
+
         if (!preg_match('/^\d{5}-?\d{3}$/', $cep)) {
             $mensagemCep = 'Digite um CEP válido com 8 números.';
         } else {
-            $cepConsulta = preg_replace('/\D/', '', $cep);
-            $urlCep = 'https://viacep.com.br/ws/' . $cepConsulta . '/json/';
+            $urlCep = 'https://viacep.com.br/ws/' . $cepNumeros . '/json/';
+
             $opcoes = [
                 'http' => [
                     'timeout' => 5,
@@ -44,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]
             ];
             $contexto = stream_context_create($opcoes);
+
             $respostaCep = @file_get_contents($urlCep, false, $contexto);
 
             if ($respostaCep === false) {
@@ -58,28 +64,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $bairro = $dadosCep['bairro'] ?? '';
                     $cidade = $dadosCep['localidade'] ?? '';
                     $uf = strtoupper($dadosCep['uf'] ?? '');
+
                     $_SESSION['cep_consultado'] = [
-                        'cep' => $cepConsulta,
+                        'cep' => $cepNumeros,
                         'logradouro' => $logradouro,
                         'bairro' => $bairro,
                         'cidade' => $cidade,
                         'uf' => $uf
                     ];
+
                     $enderecoBloqueado = true;
                     $mensagemCep = 'Endereço preenchido com sucesso!';
                 }
             }
         }
+
     } else {
-        $cepConsultaAtual = preg_replace('/\D/', '', $cep);
-        if (isset($_SESSION['cep_consultado']) && $_SESSION['cep_consultado']['cep'] === $cepConsultaAtual) {
-            $logradouro = $_SESSION['cep_consultado']['logradouro'];
-            $bairro = $_SESSION['cep_consultado']['bairro'];
-            $cidade = $_SESSION['cep_consultado']['cidade'];
-            $uf = $_SESSION['cep_consultado']['uf'];
-            $enderecoBloqueado = true;
-        } elseif (isset($_SESSION['cep_consultado'])) {
-            unset($_SESSION['cep_consultado']);
+
+        if (isset($_SESSION['cep_consultado'])) {
+            $consultado = $_SESSION['cep_consultado'];
+
+            if ($consultado['cep'] === $cepNumeros) {
+                $logradouro = $consultado['logradouro'];
+                $bairro = $consultado['bairro'];
+                $cidade = $consultado['cidade'];
+                $uf = $consultado['uf'];
+                $enderecoBloqueado = true;
+            } else {
+                unset($_SESSION['cep_consultado']);
+            }
         }
 
         if ($nome === '' || $email === '' || $senha === '') {
@@ -103,34 +116,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($uf !== '' && !preg_match('/^[A-Z]{2}$/', $uf)) {
             $erro = 'Estado (UF) deve ter 2 letras, ex: SC.';
 
-        } elseif (!in_array($id_perfil, [PERFIL_ADMIN, PERFIL_FUNCIONARIO, PERFIL_USUARIO], true)) {
+        } elseif ($id_perfil !== PERFIL_ADMIN && $id_perfil !== PERFIL_FUNCIONARIO && $id_perfil !== PERFIL_USUARIO) {
             $erro = 'Perfil inválido.';
+        }
 
-        } else {
+        if ($erro === '') {
             $stmt = $conexao->prepare("SELECT id_usuario FROM Usuario WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
-            $emailEmUso = $stmt->get_result()->num_rows > 0;
-            $stmt->close();
+            $resultado = $stmt->get_result();
 
-            if ($emailEmUso) {
+            if ($resultado->num_rows > 0) {
                 $erro = 'Este email já está cadastrado.';
             }
+            $stmt->close();
         }
 
         if ($erro === '') {
             $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-            $cep = $cep ?: null;
-            $logradouro = $logradouro ?: null;
-            $bairro = $bairro ?: null;
-            $cidade = $cidade ?: null;
-            $uf = $uf ?: null;
+            if ($cep === '') {
+                $cep = null;
+            }
+            if ($logradouro === '') {
+                $logradouro = null;
+            }
+            if ($bairro === '') {
+                $bairro = null;
+            }
+            if ($cidade === '') {
+                $cidade = null;
+            }
+            if ($uf === '') {
+                $uf = null;
+            }
 
-            $stmt = $conexao->prepare(
-                "INSERT INTO Usuario (nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            );
+            $sql = "INSERT INTO Usuario (nome, email, senha, id_perfil, cep, logradouro, bairro, cidade, uf)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conexao->prepare($sql);
             $stmt->bind_param("sssisssss", $nome, $email, $senhaHash, $id_perfil, $cep, $logradouro, $bairro, $cidade, $uf);
             $cadastrou = $stmt->execute();
             $stmt->close();
@@ -205,9 +228,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="cadastro-campo">
                                 <label for="perfilCadastro">Perfil de acesso</label>
                                 <select id="perfilCadastro" name="id_perfil" required>
-                                    <option value="<?= PERFIL_USUARIO ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_USUARIO ? 'selected' : '' ?>>Usuário</option>
-                                    <option value="<?= PERFIL_FUNCIONARIO ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_FUNCIONARIO ? 'selected' : '' ?>>Funcionário</option>
-                                    <option value="<?= PERFIL_ADMIN ?>" <?= ($id_perfil ?? PERFIL_USUARIO) === PERFIL_ADMIN ? 'selected' : '' ?>>Administrador</option>
+                                    <option value="<?= PERFIL_USUARIO ?>" <?= $id_perfil === PERFIL_USUARIO ? 'selected' : '' ?>>Usuário</option>
+                                    <option value="<?= PERFIL_FUNCIONARIO ?>" <?= $id_perfil === PERFIL_FUNCIONARIO ? 'selected' : '' ?>>Funcionário</option>
+                                    <option value="<?= PERFIL_ADMIN ?>" <?= $id_perfil === PERFIL_ADMIN ? 'selected' : '' ?>>Administrador</option>
                                 </select>
                             </div>
                         </div>
