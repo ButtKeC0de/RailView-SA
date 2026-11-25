@@ -3,7 +3,7 @@ $host = 'localhost';
 $usuario = 'root';
 $senha = '';
 $banco = 'rail_view_db';
-$porta = 3307;
+$porta = 3310;
 
 try {
     $conexao = new mysqli($host, $usuario, $senha, $banco, $porta);

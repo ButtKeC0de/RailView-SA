@@ -72,9 +72,6 @@ if (count($partesEndereco) > 0) {
                 <div class="conta-cabecalho">
                     <h2 id="dados-conta">Dados da conta</h2>
                     <div class="conta-acoes">
-                        <?php if (eh_admin()): ?>
-                            <a class="conta-botao conta-secundario" href="usuario_lista.php">Gerenciar usuários</a>
-                        <?php endif; ?>
                         <a class="conta-botao conta-primario" href="usuario_editar.php?id=<?= (int)$usuario['id_usuario'] ?>">Editar meus dados</a>
                     </div>
                 </div>
