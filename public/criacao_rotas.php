@@ -20,6 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $id_rota = filter_input(INPUT_POST, 'id_rota', FILTER_VALIDATE_INT);
 
+        $stmt = $conexao->prepare("SELECT COUNT(*) AS total FROM Sensor WHERE id_rota = ?");
+        $stmt->bind_param("i", $id_rota);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $linha = $resultado->fetch_assoc();
+        $totalSensores = (int)$linha['total'];
+        $stmt->close();
+
+        if ($totalSensores > 0) {
+            $_SESSION['mensagem_rota'] = [
+                'texto' => "A rota não pode ser excluída porque possui $totalSensores sensor(es) vinculado(s). Exclua ou troque a rota desses sensores primeiro.",
+                'tipo' => 'erro'
+            ];
+            header("Location: criacao_rotas.php");
+            exit();
+        }
+
         $stmt = $conexao->prepare("DELETE FROM Rota WHERE id_rota = ?");
         $stmt->bind_param("i", $id_rota);
         $excluiu = $stmt->execute() && $stmt->affected_rows > 0;
