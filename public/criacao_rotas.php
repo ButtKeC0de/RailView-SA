@@ -182,161 +182,175 @@ $editando = !empty($rotaForm['id_rota']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Cadastro e gerenciamento de rotas ferroviárias">
+    <title>Cadastro de Rota | Rail View</title>
 
-    <title>Cadastro de Rotas</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="../Assets/css/rotas.css">
-
-    <link rel="stylesheet" href="../Assets/css/sidebar.css">
+    <link rel="stylesheet" href="../Assets/css/sidebar.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/gestao.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sistema.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/rotas.css?v=2">
 </head>
 
-<body>
+<body class="cadastro-usuarios pagina">
     <div class="tela">
-
 
         <?php require '../infra/sidebar.php'; ?>
 
-
         <main class="conteudo">
-            <header class="topo">
-                <div>
-                    <h1 class="titulo_home">Cadastro de Rota</h1>
-                </div>
 
+            <header class="pagina-topo">
+                <h1>Cadastro de Rota</h1>
                 <?php require '../infra/usuario_topo.php'; ?>
             </header>
 
-            <section id="rotas_cadastradas" aria-label="Cadastro e listagem de rotas">
-                <article id="trens" class="card">
-                    <div class="card-cabecalho">
-                        <div>
-                            <?php if (pode_editar()): ?>
-                            <h2><?= $editando ? 'Editar Rota #' . (int)$rotaForm['id_rota'] : 'Cadastrar Rota' ?></h2>
-                            <?php else: ?>
-                            <h2>Rotas</h2>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+            <div class="pagina-corpo">
 
-                    <?php if (pode_editar()): ?>
-                    <form class="formrota" id="formRota" method="POST" action="criacao_rotas.php" autocomplete="off">
+                <?php if (!empty($mensagem['texto'])): ?>
+                    <div id="mensagemFormulario" class="alert <?= ($mensagem['tipo'] ?? '') === 'sucesso' ? 'alert-success' : 'alert-danger' ?>" role="status" aria-live="polite">
+                        <?= htmlspecialchars($mensagem['texto']) ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (pode_editar()): ?>
+                <section class="painel" aria-labelledby="tituloFormulario">
+                    <form id="formRota" method="POST" action="criacao_rotas.php" autocomplete="off">
                         <input type="hidden" name="acao" value="salvar">
                         <?php if ($editando): ?>
                             <input type="hidden" name="id_rota" value="<?= (int)$rotaForm['id_rota'] ?>">
                         <?php endif; ?>
 
-                        <div class="campo">
-                            <label for="idTrem">Trem</label>
-                            <select id="idTrem" name="id_trem" required>
-                                <option value=""><?= $trens ? 'Selecione um trem' : 'Cadastre um trem primeiro' ?></option>
-                                <?php foreach ($trens as $trem): ?>
-                                    <option value="<?= (int)$trem['id_trem'] ?>" <?= (int)$rotaForm['id_trem'] === (int)$trem['id_trem'] ? 'selected' : '' ?>>
-                                        #<?= (int)$trem['id_trem'] ?> - <?= htmlspecialchars($trem['apelido']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                        <fieldset>
+                            <legend id="tituloFormulario"><?= $editando ? 'Editar Rota #' . (int)$rotaForm['id_rota'] : 'Cadastrar Rota' ?></legend>
+                            <div class="cadastro-campos">
+                                <div class="cadastro-campo">
+                                    <label for="idTrem">Trem</label>
+                                    <select id="idTrem" name="id_trem" required>
+                                        <option value=""><?= $trens ? 'Selecione um trem' : 'Cadastre um trem primeiro' ?></option>
+                                        <?php foreach ($trens as $trem): ?>
+                                            <option value="<?= (int)$trem['id_trem'] ?>" <?= (int)$rotaForm['id_trem'] === (int)$trem['id_trem'] ? 'selected' : '' ?>>
+                                                #<?= (int)$trem['id_trem'] ?> - <?= htmlspecialchars($trem['apelido']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="cadastro-campo">
+                                    <label for="operadora">Operadora</label>
+                                    <input type="text" id="operadora" name="operadora" maxlength="150" placeholder="Ex.: Rumo" value="<?= htmlspecialchars($rotaForm['operadora']) ?>" required>
+                                </div>
+
+                                <div class="cadastro-campo">
+                                    <label for="origem">Origem</label>
+                                    <input type="text" id="origem" name="origem" maxlength="60" placeholder="Ex.: Joinville" value="<?= htmlspecialchars($rotaForm['origem']) ?>" required>
+                                </div>
+
+                                <div class="cadastro-campo">
+                                    <label for="destino">Destino</label>
+                                    <input type="text" id="destino" name="destino" maxlength="60" placeholder="Ex.: Curitiba" value="<?= htmlspecialchars($rotaForm['destino']) ?>" required>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="cadastro-acoes">
+                            <?php if ($editando): ?>
+                                <a class="cadastro-botao cadastro-voltar" href="criacao_rotas.php">Cancelar edição</a>
+                            <?php else: ?>
+                                <span></span>
+                            <?php endif; ?>
+                            <button class="cadastro-botao cadastro-salvar" type="submit">
+                                <?= $editando ? 'Salvar alterações' : 'Cadastrar rota' ?>
+                            </button>
                         </div>
-
-                        <div class="campo">
-                            <label for="origem">Origem</label>
-                            <input type="text" id="origem" name="origem" maxlength="60" placeholder="Ex.: Joinville" value="<?= htmlspecialchars($rotaForm['origem']) ?>" required>
-                        </div>
-
-                        <div class="campo">
-                            <label for="destino">Destino</label>
-                            <input type="text" id="destino" name="destino" maxlength="60" placeholder="Ex.: Curitiba" value="<?= htmlspecialchars($rotaForm['destino']) ?>" required>
-                        </div>
-
-                        <div class="campo">
-                            <label for="operadora">Operadora</label>
-                            <input type="text" id="operadora" name="operadora" maxlength="150" placeholder="Ex.: Rumo" value="<?= htmlspecialchars($rotaForm['operadora']) ?>" required>
-                        </div>
-
-                        <p id="mensagemFormulario" class="mensagem <?= htmlspecialchars($mensagem['tipo'] ?? '') ?>" role="status" aria-live="polite"><?= htmlspecialchars($mensagem['texto'] ?? '') ?></p>
-
-                        <button class="btn-cadastrar" type="submit">
-                            <i class="bi <?= $editando ? 'bi-check-lg' : 'bi-plus-lg' ?>" aria-hidden="true"></i>
-                            <?= $editando ? 'Salvar alterações' : 'Cadastrar rota' ?>
-                        </button>
-
-                        <?php if ($editando): ?>
-                            <a class="link-cancelar" href="criacao_rotas.php">Cancelar edição</a>
-                        <?php endif; ?>
                     </form>
-                    <?php endif; ?>
-                </article>
+                </section>
+                <?php endif; ?>
 
-                <article id="trens_2" class="card">
-                    <div class="lista-topo">
-                        <div>
-                            <h2>Rotas Cadastradas</h2>
-                        </div>
+                <section class="painel" aria-labelledby="tituloLista">
 
-                        <form class="pesquisa" method="GET" action="criacao_rotas.php">
-                            <i class="bi bi-search" aria-hidden="true"></i>
+                    <div class="painel-cabecalho">
+                        <h2 id="tituloLista">Rotas Cadastradas</h2>
+
+                        <form class="busca" method="GET" action="criacao_rotas.php">
                             <input type="search" id="pesquisarRota" name="pesquisa" value="<?= htmlspecialchars($pesquisa, ENT_QUOTES, 'UTF-8') ?>" placeholder="Pesquisar rota" aria-label="Pesquisar rota por trem, origem ou destino">
-                            <button type="submit">Pesquisar</button>
+                            <button type="submit" class="botao botao-secundario">Pesquisar</button>
                         </form>
                     </div>
 
-                    <div id="listaRotas" aria-live="polite">
-                        <?php foreach ($rotas as $rota): ?>
-                            <article class="rota">
-                                <div class="rota-id">Trem<br><?= $rota['id_trem'] ? (int)$rota['id_trem'] : '—' ?></div>
-                                <div class="rota-trajeto">
-                                    <strong><?= htmlspecialchars($rota['origem']) ?> → <?= htmlspecialchars($rota['destino']) ?></strong>
-                                    <span>
-                                        Rota #<?= (int)$rota['id_rota'] ?>
-                                        · <?= htmlspecialchars($rota['operadora']) ?>
-                                        <?= $rota['apelido'] ? '· ' . htmlspecialchars($rota['apelido']) : '' ?>
-                                    </span>
-                                </div>
-                                <?php if (pode_editar()): ?>
-                                <div class="rota-acoes">
-                                    <a class="btn-editar" href="criacao_rotas.php?editar=<?= (int)$rota['id_rota'] ?>" title="Editar rota" aria-label="Editar rota de <?= htmlspecialchars($rota['origem']) ?> para <?= htmlspecialchars($rota['destino']) ?>">
-                                        <i class="bi bi-pencil-fill" aria-hidden="true"></i>
-                                    </a>
-                                    <?php if (eh_admin()): ?>
-                                    <form method="POST" action="criacao_rotas.php" class="form-excluir">
-                                        <input type="hidden" name="acao" value="excluir">
-                                        <input type="hidden" name="id_rota" value="<?= (int)$rota['id_rota'] ?>">
-                                        <button class="btn-excluir" type="submit" aria-label="Excluir rota de <?= htmlspecialchars($rota['origem']) ?> para <?= htmlspecialchars($rota['destino']) ?>" title="Excluir rota">
-                                            <i class="bi bi-trash3-fill" aria-hidden="true"></i>
-                                        </button>
-                                    </form>
+                    <?php if ($rotas): ?>
+                    <div class="tabela-area" id="listaRotas" aria-live="polite">
+                        <table class="tabela">
+                            <thead>
+                                <tr>
+                                    <th>Rota</th>
+                                    <th>Trajeto</th>
+                                    <th>Trem</th>
+                                    <th>Operadora</th>
+                                    <?php if (pode_editar()): ?>
+                                        <th class="coluna-acoes">Ações</th>
                                     <?php endif; ?>
-                                </div>
-                                <?php endif; ?>
-                            </article>
-                        <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($rotas as $rota): ?>
+                                    <tr>
+                                        <td class="texto-suave">#<?= (int)$rota['id_rota'] ?></td>
+                                        <td><strong><?= htmlspecialchars($rota['origem']) ?> → <?= htmlspecialchars($rota['destino']) ?></strong></td>
+                                        <td>
+                                            <?php if ($rota['id_trem']): ?>
+                                                <span class="etiqueta">Trem <?= (int)$rota['id_trem'] ?></span>
+                                                <?= $rota['apelido'] ? htmlspecialchars($rota['apelido']) : '' ?>
+                                            <?php else: ?>
+                                                <span class="texto-suave">—</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($rota['operadora']) ?></td>
+                                        <?php if (pode_editar()): ?>
+                                        <td class="coluna-acoes">
+                                            <a class="botao botao-secundario botao-pequeno" href="criacao_rotas.php?editar=<?= (int)$rota['id_rota'] ?>" title="Editar rota" aria-label="Editar rota de <?= htmlspecialchars($rota['origem']) ?> para <?= htmlspecialchars($rota['destino']) ?>">
+                                                <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                                            </a>
+                                            <?php if (eh_admin()): ?>
+                                            <form method="POST" action="criacao_rotas.php">
+                                                <input type="hidden" name="acao" value="excluir">
+                                                <input type="hidden" name="id_rota" value="<?= (int)$rota['id_rota'] ?>">
+                                                <button class="botao botao-perigo botao-pequeno" type="submit" aria-label="Excluir rota de <?= htmlspecialchars($rota['origem']) ?> para <?= htmlspecialchars($rota['destino']) ?>" title="Excluir rota">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i> Excluir
+                                                </button>
+                                            </form>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php endif; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <?php if (!$rotas): ?>
+                    <?php else: ?>
                     <div id="estadoVazio" class="estado-vazio">
                         <h3><?= $pesquisa !== '' ? 'Nenhuma rota encontrada' : 'Nenhuma rota cadastrada' ?></h3>
                     </div>
                     <?php endif; ?>
-                </article>
-            </section>
 
-            <section class="parte_baixo_home" aria-labelledby="tituloMapa">
-                <div class="mapa-cabecalho">
-                    <h2 id="tituloMapa">Mapa das rotas</h2>
-                </div>
+                </section>
 
-                <div class="card_mapa">
-                    <iframe
-                        src="https://www.openstreetmap.org/export/embed.html?bbox=-49.42%2C-25.62%2C-49.16%2C-25.36&amp;layer=mapnik"
-                        title="Mapa das rotas"
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </section>
+                <section class="painel" aria-labelledby="tituloMapa">
+                    <div class="painel-cabecalho">
+                        <h2 id="tituloMapa">Mapa das rotas</h2>
+                    </div>
+
+                    <div class="card_mapa">
+                        <iframe
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=-49.42%2C-25.62%2C-49.16%2C-25.36&amp;layer=mapnik"
+                            title="Mapa das rotas"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </section>
+
+            </div>
+
         </main>
     </div>
 </body>
