@@ -19,16 +19,24 @@ if (!$id) {
     exit();
 }
 
-$stmt = $conexao->prepare("SELECT COUNT(*) AS total FROM Sensor WHERE id_trem = ?");
+$sql = "SELECT COUNT(DISTINCT s.id_sensor) AS total
+        FROM Sensor s
+        JOIN Historico_Rota h ON h.id_rota = s.id_rota
+        WHERE h.id_trem = ?";
+$stmt = $conexao->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$totalSensores = (int)$stmt->get_result()->fetch_assoc()['total'];
+$resultado = $stmt->get_result();
+$linha = $resultado->fetch_assoc();
+$totalSensores = (int)$linha['total'];
 $stmt->close();
 
 $stmt = $conexao->prepare("SELECT COUNT(*) AS total FROM Historico_Rota WHERE id_trem = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$totalRotas = (int)$stmt->get_result()->fetch_assoc()['total'];
+$resultado = $stmt->get_result();
+$linha = $resultado->fetch_assoc();
+$totalRotas = (int)$linha['total'];
 $stmt->close();
 
 if ($totalSensores > 0 || $totalRotas > 0) {
