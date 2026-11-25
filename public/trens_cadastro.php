@@ -127,184 +127,148 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Cadastrar Trem</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
-    <link rel="stylesheet" href="../Assets/css/trem.css">
-    <link rel="stylesheet" href="../Assets/css/sidebar.css">
+    <link rel="stylesheet" href="../Assets/css/sidebar.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/gestao.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sistema.css?v=2">
 </head>
-<body>
 
-<div class="app-container">
-    <?php require '../infra/sidebar.php'; ?>
-    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
+<body class="cadastro-usuarios pagina">
+    <div class="tela">
+        <?php require '../infra/sidebar.php'; ?>
+        <main class="conteudo">
+            <header class="cadastro-topo">
+                <h1>Cadastrar trem</h1>
+                <?php require '../infra/usuario_topo.php'; ?>
+            </header>
+            <section class="cadastro-painel" aria-label="Dados do novo trem">
+                <?= $mensagem ?>
 
-    <main class="content">
-        <section class="painel-cadastro">
+                <?php if (empty($usuarios)): ?>
+                    <div class="alert alert-warning">
+                        Não existem usuários cadastrados.
+                        Cadastre um usuário antes de registrar um trem.
+                    </div>
+                <?php endif; ?>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="titulo m-0">Cadastrar trem</h1>
-
-                <a href="trens_lista.php"
-                   class="btn btn-dark text-white rounded-pill px-4 py-2">
-                    ← Ver Lista
-                </a>
-            </div>
-
-            <?= $mensagem ?>
-
-            <?php if (empty($usuarios)): ?>
-                <div class="alert alert-warning">
-                    Não existem usuários cadastrados.
-                    Cadastre um usuário antes de registrar um trem.
-                </div>
-            <?php endif; ?>
-
-            <form action="" method="POST">
-                <div class="row g-4 align-items-center">
-
-                    <div class="col-lg-8">
-                        <div class="row g-4">
-
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="modelo">Modelo do trem</label>
-
-                                    <input
-                                        type="text"
-                                        id="modelo"
-                                        name="modelo"
-                                        value="<?= htmlspecialchars($modelo, ENT_QUOTES, 'UTF-8') ?>"
-                                        placeholder="Coloque o modelo"
-                                        required
-                                    >
-                                </div>
+                <form action="" method="POST">
+                    <fieldset>
+                        <legend>Dados do trem</legend>
+                        <div class="cadastro-campos">
+                            <div class="cadastro-campo">
+                                <label for="modelo">Modelo do trem</label>
+                                <input
+                                    type="text"
+                                    id="modelo"
+                                    name="modelo"
+                                    value="<?= htmlspecialchars($modelo, ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="Coloque o modelo"
+                                    required
+                                >
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="apelido">Apelido do trem</label>
-
-                                    <input
-                                        type="text"
-                                        id="apelido"
-                                        name="apelido"
-                                        value="<?= htmlspecialchars($apelido, ENT_QUOTES, 'UTF-8') ?>"
-                                        placeholder="Coloque o apelido"
-                                        required
-                                    >
-                                </div>
+                            <div class="cadastro-campo">
+                                <label for="apelido">Apelido do trem</label>
+                                <input
+                                    type="text"
+                                    id="apelido"
+                                    name="apelido"
+                                    value="<?= htmlspecialchars($apelido, ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="Coloque o apelido"
+                                    required
+                                >
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="operadora">Empresa operadora</label>
-
-                                    <input
-                                        type="text"
-                                        id="operadora"
-                                        name="operadora"
-                                        value="<?= htmlspecialchars($operadora, ENT_QUOTES, 'UTF-8') ?>"
-                                        placeholder="Coloque a operadora"
-                                    >
-                                </div>
+                            <div class="cadastro-campo">
+                                <label for="operadora">Empresa operadora</label>
+                                <input
+                                    type="text"
+                                    id="operadora"
+                                    name="operadora"
+                                    value="<?= htmlspecialchars($operadora, ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="Coloque a operadora"
+                                >
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="tipo">Tipo do trem</label>
-
-                                    <input
-                                        type="text"
-                                        id="tipo"
-                                        name="tipo"
-                                        value="<?= htmlspecialchars($tipo, ENT_QUOTES, 'UTF-8') ?>"
-                                        placeholder="Coloque o tipo"
-                                        required
-                                    >
-                                </div>
+                            <div class="cadastro-campo">
+                                <label for="tipo">Tipo do trem</label>
+                                <input
+                                    type="text"
+                                    id="tipo"
+                                    name="tipo"
+                                    value="<?= htmlspecialchars($tipo, ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="Coloque o tipo"
+                                    required
+                                >
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="vagoes">Número de vagões</label>
-
-                                    <input
-                                        type="number"
-                                        id="vagoes"
-                                        name="vagoes"
-                                        value="<?= htmlspecialchars((string)($vagoes ?: ''), ENT_QUOTES, 'UTF-8') ?>"
-                                        placeholder="Coloque o número"
-                                        min="1"
-                                        required
-                                    >
-                                </div>
+                            <div class="cadastro-campo">
+                                <label for="vagoes">Número de vagões</label>
+                                <input
+                                    type="number"
+                                    id="vagoes"
+                                    name="vagoes"
+                                    value="<?= htmlspecialchars((string)($vagoes ?: ''), ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="Coloque o número"
+                                    min="1"
+                                    required
+                                >
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card-input">
-                                    <label for="id_usuario">
-                                        Funcionário responsável
-                                    </label>
+                            <div class="cadastro-campo">
+                                <label for="id_usuario">Funcionário responsável</label>
+                                <select
+                                    id="id_usuario"
+                                    name="id_usuario"
+                                    required
+                                >
+                                    <option value="">
+                                        Selecione um responsável
+                                    </option>
 
-                                    <select
-                                        id="id_usuario"
-                                        name="id_usuario"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="">
-                                            Selecione um responsável
+                                    <?php foreach ($usuarios as $usuario): ?>
+                                        <option
+                                            value="<?= (int)$usuario['id_usuario'] ?>"
+                                            <?= (string)$id_usuario === (string)$usuario['id_usuario']
+                                                ? 'selected'
+                                                : '' ?>
+                                        >
+                                            <?= htmlspecialchars(
+                                                $usuario['nome'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
                                         </option>
-
-                                        <?php foreach ($usuarios as $usuario): ?>
-                                            <option
-                                                value="<?= (int)$usuario['id_usuario'] ?>"
-                                                <?= (string)$id_usuario === (string)$usuario['id_usuario']
-                                                    ? 'selected'
-                                                    : '' ?>
-                                            >
-                                                <?= htmlspecialchars(
-                                                    $usuario['nome'],
-                                                    ENT_QUOTES,
-                                                    'UTF-8'
-                                                ) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-
                         </div>
+                    </fieldset>
+
+                    <div class="cadastro-acoes">
+                        <a href="trens_lista.php" class="cadastro-botao cadastro-voltar">← Ver Lista</a>
+                        <button
+                            type="submit"
+                            class="cadastro-botao cadastro-salvar"
+                            <?= empty($usuarios) ? 'disabled' : '' ?>
+                        >
+                            Enviar
+                        </button>
                     </div>
-
-                    <div class="col-lg-4 d-flex justify-content-center align-items-center">
-                        <div class="botao-container">
-                            <button
-                                type="submit"
-                                class="btn-enviar"
-                                <?= empty($usuarios) ? 'disabled' : '' ?>
-                            >
-                                Enviar
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </form>
-
-        </section>
-    </main>
-</div>
+                </form>
+            </section>
+        </main>
+    </div>
 </body>
 </html>
