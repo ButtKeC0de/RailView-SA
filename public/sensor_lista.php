@@ -1,70 +1,81 @@
+
 <?php
 require_once '../infra/auth.php';
 exigir_login();
 
+// Recebe o ID do sensor
+$id_sensor = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-$mensagem = "";
-if (isset($_SESSION['mensagem'])) {
-    $mensagem = $_SESSION['mensagem'];
-    unset($_SESSION['mensagem']);
+if (!$id_sensor) {
+    header("Location: sensor_home.php");
+    exit();
 }
 
+// Busca os dados do sensor e sua rota
+$sql = "
+    SELECT
+        s.id_sensor,
+        s.tipo_sensor,
+        s.status_sensor,
+        s.empresa_operadora,
+        s.id_rota,
+        r.nome_rota,
+        r.origem,
+        r.destino
+    FROM Sensor s
+    LEFT JOIN Rota r ON s.id_rota = r.id_rota
+    WHERE s.id_sensor = ?
+";
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$pesquisa = trim($_GET['pesquisa'] ?? '');
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("i", $id_sensor);
+$stmt->execute();
 
-$select = "SELECT
-               s.id_sensor,
-               s.tipo_sensor,
-               s.localizacao,
-               s.status_sensor,
-               s.empresa_operadora,
-               s.id_trem,
-               t.apelido AS nome_trem,
-               t.modelo AS modelo_trem
-           FROM Sensor s
-           LEFT JOIN Trem t ON s.id_trem = t.id_trem";
+$sensor = $stmt->get_result()->fetch_assoc();
 
-if ($id) {
+$stmt->close();
 
-    $stmt = $conexao->prepare($select . " WHERE s.id_sensor = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $stmt->close();
-} elseif ($pesquisa !== '') {
-    $like = '%' . $pesquisa . '%';
-    $stmt = $conexao->prepare($select . " WHERE CAST(s.id_sensor AS CHAR) LIKE ? OR s.tipo_sensor LIKE ? OR s.localizacao LIKE ? OR s.empresa_operadora LIKE ? OR t.apelido LIKE ? ORDER BY s.id_sensor DESC");
-    $stmt->bind_param("sssss", $like, $like, $like, $like, $like);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $stmt->close();
-} else {
-    $resultado = $conexao->query($select . " ORDER BY s.id_sensor DESC");
+// Verifica se o sensor existe
+if (!$sensor) {
+
+    $_SESSION['mensagem'] = mensagem('warning', 'Sensor não encontrado.');
+
+    header("Location: sensor_home.php");
+    exit();
 }
 
-$sensores = [];
+// Define a cor do status
+$statusClass = 'badge-ativo';
 
-if ($resultado) {
-    while ($row = $resultado->fetch_assoc()) {
-        $sensores[] = $row;
-    }
+if ($sensor['status_sensor'] == 'Inativo') {
+
+    $statusClass = 'badge-inativo';
+
+} elseif ($sensor['status_sensor'] == 'Manutenção') {
+
+    $statusClass = 'badge-manutencao';
+
 }
+
 ?>
+
 <!doctype html>
 <html lang="pt-br">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Sensores - Rail View</title>
+
+    <title>Detalhes do Sensor</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/css/sensor.css">
     <link rel="stylesheet" href="../Assets/css/sidebar.css">
+
 </head>
 
 <body>
@@ -72,108 +83,131 @@ if ($resultado) {
     <div class="app-container d-flex">
 
         <?php require '../infra/sidebar.php'; ?>
-    <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
+
+        <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
 
         <main class="content flex-grow-1 p-4">
 
             <section class="painel-cadastro">
 
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-                    <h1 class="titulo m-0">Sensores Cadastrados</h1>
-                    <?php if (pode_editar()): ?>
-                    <a href="sensor_cadastro.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                         Cadastrar Sensor
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <h1 class="titulo m-0">
+                        Detalhes do Sensor
+                    </h1>
+
+                    <a href="sensor_home.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
+                        ← Voltar
                     </a>
-                    <?php endif; ?>
+
                 </div>
 
-                <?php if (!empty($mensagem)) echo $mensagem; ?>
+                <div class="card-sensor">
 
-                <?php if ($id): ?>
-                    <p class="mb-3"><a href="sensor_lista.php" class="btn btn-dark btn-sm rounded-pill px-3">&larr; Ver todos os sensores</a></p>
-                <?php endif; ?>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <div class="mb-4">
-                    <form method="GET" action="sensor_lista.php" class="d-flex gap-2">
-                    <input type="text" name="pesquisa" class="form-control input-busca" placeholder="Pesquisar por tipo, localização, operadora ou trem..." value="<?= htmlspecialchars($pesquisa, ENT_QUOTES, 'UTF-8') ?>">
-                    <button type="submit" class="btn btn-dark">Pesquisar</button>
-                    </form>
-                </div>
+                        <h4 class="m-0">
+                            Sensor #<?= (int)$sensor['id_sensor'] ?>
+                        </h4>
 
-                <div id="listaSensores">
-                    <?php if (count($sensores) > 0): ?>
-                        <div class="row g-3">
-                            <?php foreach ($sensores as $sensor): ?>
-                                <?php 
-                                    $statusClass = 'badge-ativo';
-                                    if (mb_strtolower($sensor['status_sensor']) === 'inativo') {
-                                        $statusClass = 'badge-inativo';
-                                    } elseif (mb_strtolower($sensor['status_sensor']) === 'manutenção' || mb_strtolower($sensor['status_sensor']) === 'manutencao') {
-                                        $statusClass = 'badge-manutencao';
-                                    }
-                                ?>
-                                <div class="col-md-6 col-lg-4 item-sensor">
-                                    <div class="card-sensor">
-                                        
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="badge badge-status <?= $statusClass ?>">
-                                                    <?= htmlspecialchars($sensor['status_sensor']) ?>
-                                                </span>
+                        <span class="badge badge-status <?= $statusClass ?>">
 
-                                                <?php if (pode_editar()): ?>
-                                                <a href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Editar">
-                                                    Editar
-                                                </a>
+                            <?= htmlspecialchars($sensor['status_sensor'], ENT_QUOTES, 'UTF-8') ?>
 
-                                                <?php if (eh_admin()): ?>
-                                                <form action="sensor_excluir.php" method="POST" class="d-inline">
-                                                    <input type="hidden" name="id" value="<?= (int)$sensor['id_sensor'] ?>">
-                                                    <button type="submit" class="btn btn-sm btn-danger text-white fw-bold rounded-pill px-2 py-0" style="font-size: 0.75rem;" title="Excluir">
-                                                        Excluir
-                                                    </button>
-                                                </form>
-                                                <?php endif; ?>
-                                                <?php endif; ?>
-                                            </div>
+                        </span>
 
-                                            <small class="text-muted">#<?= (int)$sensor['id_sensor'] ?></small>
-                                        </div>
+                    </div>
 
-                                        <div class="mb-2">
-                                            <div class="label-campo">TIPO DO SENSOR</div>
-                                            <div class="valor-campo fw-bold"><?= htmlspecialchars($sensor['tipo_sensor']) ?></div>
-                                        </div>
+                    <div class="mb-4">
 
-                                        <div class="mb-2">
-                                            <div class="label-campo">LOCALIZAÇÃO</div>
-                                            <div class="valor-campo"><?= htmlspecialchars($sensor['localizacao']) ?></div>
-                                        </div>
+                        <div class="label-campo">TIPO DO SENSOR</div>
 
-                                        <div class="mb-2">
-                                            <div class="label-campo">EMPRESA OPERADORA</div>
-                                            <div class="valor-campo"><?= htmlspecialchars($sensor['empresa_operadora']) ?></div>
-                                        </div>
+                        <div class="valor-campo fw-bold">
 
-                                        <div class="mb-0">
-                                            <div class="label-campo">TREM VINCULADO</div>
-                                            <div class="valor-campo text-warning">
-                                                <?= !empty($sensor['nome_trem']) ? htmlspecialchars($sensor['nome_trem']) . ' (' . htmlspecialchars($sensor['modelo_trem']) . ')' : 'Não informado' ?>
-                                            </div>
-                                        </div>
+                            <?= htmlspecialchars($sensor['tipo_sensor'], ENT_QUOTES, 'UTF-8') ?>
 
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
                         </div>
-                    <?php else: ?>
-                        <div class="estado-vazio estado-vazio--simples bg-white rounded-4">
-                            <h3><?= $id ? 'Sensor não encontrado' : 'Nenhum sensor cadastrado' ?></h3>
-                            <?php if (pode_editar()): ?>
-                                <a href="sensor_cadastro.php" class="btn btn-dark rounded-pill px-4">+ Cadastrar primeiro sensor</a>
-                            <?php endif; ?>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <div class="label-campo">EMPRESA OPERADORA</div>
+
+                        <div class="valor-campo">
+
+                            <?= htmlspecialchars($sensor['empresa_operadora'], ENT_QUOTES, 'UTF-8') ?>
+
                         </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <div class="label-campo">ROTA VINCULADA</div>
+
+                        <div class="valor-campo text-warning">
+
+                            <?= htmlspecialchars($sensor['nome_rota'] ?? 'Não informada', ENT_QUOTES, 'UTF-8') ?>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <div class="label-campo">ORIGEM E DESTINO DA ROTA</div>
+
+                        <div class="valor-campo">
+
+                            <?= htmlspecialchars($sensor['origem'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
+
+                            -
+
+                            <?= htmlspecialchars($sensor['destino'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
+
+                        </div>
+
+                    </div>
+
+                    <?php if (pode_editar()): ?>
+
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+
+                            <a
+                                href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>"
+                                class="btn btn-warning rounded-pill px-4"
+                            >
+                                <i class="bi bi-pencil-square"></i>
+                                Editar
+                            </a>
+
+                            <form
+                                action="sensor_excluir.php"
+                                method="POST"
+                                onsubmit="return confirm('Deseja realmente excluir este sensor?');"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?= (int)$sensor['id_sensor'] ?>"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger rounded-pill px-4"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                    Excluir
+                                </button>
+
+                            </form>
+
+                        </div>
+
                     <?php endif; ?>
+
                 </div>
 
             </section>
@@ -181,6 +215,7 @@ if ($resultado) {
         </main>
 
     </div>
+
 </body>
 
 </html>
