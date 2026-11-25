@@ -2,25 +2,50 @@
 require_once '../infra/auth.php';
 exigir_login();
 
-if (isset($_SESSION['clima']) && time() - $_SESSION['clima']['hora'] < 600) {
+
+$temperaturaClima = 'Clima indisponível';
+
+if (
+    isset($_SESSION['clima']) &&
+    time() - $_SESSION['clima']['hora'] < 600 &&
+    $_SESSION['clima']['texto'] !== 'Clima indisponível'
+) {
     $temperaturaClima = $_SESSION['clima']['texto'];
+
 } else {
-    $temperaturaClima = 'Clima indisponível';
+
     $urlClima = 'https://api.open-meteo.com/v1/forecast?latitude=-26.3044&longitude=-48.8487&current=temperature_2m&temperature_unit=celsius&timezone=America%2FSao_Paulo';
 
     $opcoes = [
         'http' => [
-            'timeout' => 3
+            'method' => 'GET',
+            'timeout' => 10,
+            'header' => "User-Agent: RailView/1.0\r\n"
         ]
     ];
+
     $contexto = stream_context_create($opcoes);
-    $respostaClima = @file_get_contents($urlClima, false, $contexto);
+
+    $respostaClima = @file_get_contents(
+        $urlClima,
+        false,
+        $contexto
+    );
 
     if ($respostaClima !== false) {
+
         $dadosClima = json_decode($respostaClima, true);
+
         $valorTemperatura = $dadosClima['current']['temperature_2m'] ?? null;
+
         if (is_numeric($valorTemperatura)) {
-            $temperaturaClima = number_format((float)$valorTemperatura, 0, ',', '.') . ' °C';
+
+            $temperaturaClima = number_format(
+                (float)$valorTemperatura,
+                0,
+                ',',
+                '.'
+            ) . ' °C';
         }
     }
 
@@ -29,6 +54,7 @@ if (isset($_SESSION['clima']) && time() - $_SESSION['clima']['hora'] < 600) {
         'hora' => time()
     ];
 }
+
 
 $sql = "SELECT
             (SELECT COUNT(*) FROM Rota) AS rotas,
