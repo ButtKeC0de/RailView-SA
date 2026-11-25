@@ -45,15 +45,15 @@ if (!$sensor) {
 }
 
 // Define a cor do status
-$statusClass = 'badge-ativo';
+$statusClass = 'etiqueta-ativo';
 
 if ($sensor['status_sensor'] == 'Inativo') {
 
-    $statusClass = 'badge-inativo';
+    $statusClass = 'etiqueta-inativo';
 
 } elseif ($sensor['status_sensor'] == 'Manutenção') {
 
-    $statusClass = 'badge-manutencao';
+    $statusClass = 'etiqueta-manutencao';
 
 }
 
@@ -63,154 +63,114 @@ if ($sensor['status_sensor'] == 'Inativo') {
 <html lang="pt-br">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Detalhes do Sensor</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="../Assets/css/sensor.css">
-    <link rel="stylesheet" href="../Assets/css/sidebar.css">
-
+    <link rel="stylesheet" href="../Assets/css/sidebar.css?v=2">
+    <link rel="stylesheet" href="../Assets/css/sistema.css?v=2">
 </head>
 
-<body>
+<body class="pagina">
 
-    <div class="app-container d-flex">
+    <div class="tela">
 
         <?php require '../infra/sidebar.php'; ?>
 
-        <?php $usuarioFixo = true; require '../infra/usuario_topo.php'; ?>
+        <main class="conteudo">
 
-        <main class="content flex-grow-1 p-4">
+            <header class="pagina-topo">
+                <h1>Detalhes do Sensor</h1>
+                <?php require '../infra/usuario_topo.php'; ?>
+            </header>
 
-            <section class="painel-cadastro">
+            <div class="pagina-corpo">
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <section class="painel">
 
-                    <h1 class="titulo m-0">
-                        Detalhes do Sensor
-                    </h1>
+                    <div class="painel-cabecalho">
 
-                    <a href="sensor_home.php" class="btn btn-dark text-white rounded-pill px-4 py-2">
-                        ← Voltar
-                    </a>
-
-                </div>
-
-                <div class="card-sensor">
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-
-                        <h4 class="m-0">
-                            Sensor #<?= (int)$sensor['id_sensor'] ?>
-                        </h4>
-
-                        <span class="badge badge-status <?= $statusClass ?>">
-
-                            <?= htmlspecialchars($sensor['status_sensor'], ENT_QUOTES, 'UTF-8') ?>
-
-                        </span>
-
-                    </div>
-
-                    <div class="mb-4">
-
-                        <div class="label-campo">TIPO DO SENSOR</div>
-
-                        <div class="valor-campo fw-bold">
-
-                            <?= htmlspecialchars($sensor['tipo_sensor'], ENT_QUOTES, 'UTF-8') ?>
-
+                        <div class="acoes">
+                            <h2>Sensor #<?= (int)$sensor['id_sensor'] ?></h2>
+                            <span class="etiqueta <?= $statusClass ?>">
+                                <?= htmlspecialchars($sensor['status_sensor'], ENT_QUOTES, 'UTF-8') ?>
+                            </span>
                         </div>
 
-                    </div>
+                        <div class="acoes">
 
-                    <div class="mb-4">
+                            <a href="sensor_home.php" class="botao botao-secundario">← Voltar</a>
 
-                        <div class="label-campo">EMPRESA OPERADORA</div>
+                            <?php if (pode_editar()): ?>
 
-                        <div class="valor-campo">
+                                <a
+                                    href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>"
+                                    class="botao botao-secundario"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                    Editar
+                                </a>
 
-                            <?= htmlspecialchars($sensor['empresa_operadora'], ENT_QUOTES, 'UTF-8') ?>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mb-4">
-
-                        <div class="label-campo">ROTA VINCULADA</div>
-
-                        <div class="valor-campo text-warning">
-
-                            <?= htmlspecialchars($sensor['nome_rota'] ?? 'Não informada', ENT_QUOTES, 'UTF-8') ?>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mb-4">
-
-                        <div class="label-campo">ORIGEM E DESTINO DA ROTA</div>
-
-                        <div class="valor-campo">
-
-                            <?= htmlspecialchars($sensor['origem'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
-
-                            -
-
-                            <?= htmlspecialchars($sensor['destino'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
-
-                        </div>
-
-                    </div>
-
-                    <?php if (pode_editar()): ?>
-
-                        <div class="d-flex gap-2 justify-content-end mt-4">
-
-                            <a
-                                href="sensor_editar.php?id=<?= (int)$sensor['id_sensor'] ?>"
-                                class="btn btn-warning rounded-pill px-4"
-                            >
-                                <i class="bi bi-pencil-square"></i>
-                                Editar
-                            </a>
-
-                            <form
-                                action="sensor_excluir.php"
-                                method="POST"
-                                onsubmit="return confirm('Deseja realmente excluir este sensor?');"
-                            >
-
-                                <input
-                                    type="hidden"
-                                    name="id"
-                                    value="<?= (int)$sensor['id_sensor'] ?>"
+                                <form
+                                    action="sensor_excluir.php"
+                                    method="POST"
+                                    onsubmit="return confirm('Deseja realmente excluir este sensor?');"
                                 >
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-danger rounded-pill px-4"
-                                >
-                                    <i class="bi bi-trash"></i>
-                                    Excluir
-                                </button>
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?= (int)$sensor['id_sensor'] ?>"
+                                    >
 
-                            </form>
+                                    <button type="submit" class="botao botao-perigo">
+                                        <i class="bi bi-trash"></i>
+                                        Excluir
+                                    </button>
+
+                                </form>
+
+                            <?php endif; ?>
 
                         </div>
 
-                    <?php endif; ?>
+                    </div>
 
-                </div>
+                    <dl class="dados">
 
-            </section>
+                        <div>
+                            <dt>Tipo do sensor</dt>
+                            <dd><strong><?= htmlspecialchars($sensor['tipo_sensor'], ENT_QUOTES, 'UTF-8') ?></strong></dd>
+                        </div>
+
+                        <div>
+                            <dt>Empresa operadora</dt>
+                            <dd><?= htmlspecialchars($sensor['empresa_operadora'], ENT_QUOTES, 'UTF-8') ?></dd>
+                        </div>
+
+                        <div>
+                            <dt>Rota vinculada</dt>
+                            <dd><?= htmlspecialchars($sensor['nome_rota'] ?? 'Não informada', ENT_QUOTES, 'UTF-8') ?></dd>
+                        </div>
+
+                        <div>
+                            <dt>Origem e destino da rota</dt>
+                            <dd>
+                                <?= htmlspecialchars($sensor['origem'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
+                                -
+                                <?= htmlspecialchars($sensor['destino'] ?? 'Não informado', ENT_QUOTES, 'UTF-8') ?>
+                            </dd>
+                        </div>
+
+                    </dl>
+
+                </section>
+
+            </div>
 
         </main>
 
